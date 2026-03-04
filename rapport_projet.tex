@@ -1,0 +1,505 @@
+% =============================================================
+% RAPPORT DE PROJET - ENSA Orientation
+% Application Web d'Orientation Académique Intelligente
+% =============================================================
+\documentclass[12pt,a4paper]{report}
+
+% ============= Package Imports =============
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% Fonts modernes
+\usepackage{lmodern}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% Colors
+\usepackage{xcolor}
+\definecolor{primary}{HTML}{CA6F1E}
+\definecolor{primarydark}{HTML}{A04000}
+\definecolor{textmain}{HTML}{1E293B}
+\definecolor{textlight}{HTML}{64748B}
+\definecolor{background}{HTML}{F8FAFC}
+\definecolor{codebg}{HTML}{F1F5F9}
+
+% Graphics
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, shadows.blur}
+
+% Lists and Tables
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+
+% Code listings
+\usepackage{listings}
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{codebg},
+    frame=single,
+    rulecolor=\color{textlight},
+    breaklines=true,
+    showstringspaces=false,
+    keywordstyle=\color{primary}\bfseries,
+    commentstyle=\color{textlight}\itshape,
+    stringstyle=\color{primarydark},
+}
+
+% Hyperlinks
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    urlcolor=primarydark,
+    pdfauthor={ENSA Safi},
+    pdftitle={Rapport de Projet - Orientation Intelligente}
+}
+
+% Headers and Footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{textlight}{\small ENSA Safi - Projet Orientation}}
+\fancyhead[R]{\textcolor{textlight}{\small \thepage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Chapter styling
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries\color{primary}}
+{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titleformat{\section}
+{\normalfont\Large\bfseries\color{primarydark}}{\thesection}{1em}{}
+\titleformat{\subsection}
+{\normalfont\large\bfseries\color{textmain}}{\thesubsection}{1em}{}
+
+% Boxes
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{infobox}[1][]{
+    colback=background,
+    colframe=primary,
+    title=#1,
+    fonttitle=\bfseries\color{white},
+    coltitle=white,
+    colbacktitle=primary,
+    boxrule=0.5pt,
+    arc=4pt,
+    left=10pt,right=10pt,top=10pt,bottom=10pt,
+    breakable
+}
+
+\newtcolorbox{codebox}[1][]{
+    colback=codebg,
+    colframe=textlight,
+    title=#1,
+    fonttitle=\bfseries\ttfamily,
+    boxrule=0.5pt,
+    arc=2pt,
+    left=5pt,right=5pt,top=5pt,bottom=5pt,
+}
+
+% ============= Document =============
+\begin{document}
+
+% ============= Title Page =============
+\begin{titlepage}
+    \begin{tikzpicture}[remember picture, overlay]
+        % Background gradient effect
+        \fill[primary!10] (current page.south west) rectangle (current page.north east);
+        \fill[primary] (current page.north west) rectangle ([yshift=-6cm]current page.north east);
+        
+        % Decorative elements
+        \foreach \i in {1,...,15} {
+            \fill[white, opacity=0.03] (rand*20,-rand*5) circle (rand*2+1);
+        }
+    \end{tikzpicture}
+    
+    \vspace*{-2cm}
+    \begin{center}
+        \textcolor{white}{
+            {\LARGE\bfseries École Nationale des Sciences Appliquées}\\[0.3cm]
+            {\Large de Safi}\\[1cm]
+            \rule{0.5\textwidth}{0.4pt}
+        }
+    \end{center}
+    
+    \vspace{3cm}
+    
+    \begin{center}
+        {\Huge\bfseries\textcolor{primary}{RAPPORT DE PROJET}}\\[0.8cm]
+        {\LARGE\textcolor{textmain}{Application Web d'Orientation}}\\[0.3cm]
+        {\LARGE\textcolor{textmain}{Académique Intelligente}}\\[1.5cm]
+        
+        {\Large\textcolor{primarydark}{\textbf{ENSA}Guide}}\\[0.3cm]
+        {\large\textcolor{textlight}{Système d'aide à la décision pour les étudiants}}
+    \end{center}
+    
+    \vfill
+    
+    \begin{center}
+        \begin{tcolorbox}[
+            colback=white,
+            colframe=primary,
+            width=0.8\textwidth,
+            arc=8pt,
+            boxrule=1pt
+        ]
+            \centering
+            \textbf{Réalisé par :}\\[0.3cm]
+            EL KIHEL Riyad \quad | \quad EL MESSAOUDI Othmane \quad | \quad HALOUBI Ahmed\\[0.5cm]
+            \textbf{Année Universitaire :} 2025-2026
+        \end{tcolorbox}
+    \end{center}
+    
+    \vspace{1cm}
+\end{titlepage}
+
+% ============= Table of Contents =============
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+% ============= Chapter 1: Introduction =============
+\chapter{Introduction}
+
+\section{Contexte du Projet}
+
+L'École Nationale des Sciences Appliquées (ENSA) de Safi propose six filières d'ingénierie distinctes aux étudiants ayant terminé leur cycle préparatoire. Le choix de la filière est une étape cruciale qui détermine le parcours professionnel futur de l'étudiant.
+
+\begin{infobox}[Problématique]
+Comment aider les étudiants du cycle préparatoire à identifier la filière qui correspond le mieux à leurs intérêts, compétences et aspirations professionnelles ?
+\end{infobox}
+
+\section{Objectifs du Projet}
+
+Le projet \textbf{ENSAGuide} vise à :
+
+\begin{enumerate}[leftmargin=*]
+    \item Développer un \textbf{test d'orientation intelligent} basé sur un système de pondération.
+    \item Créer une \textbf{interface web moderne} et responsive.
+    \item Intégrer un \textbf{chatbot conversationnel} pour répondre aux questions fréquentes.
+    \item Fournir des \textbf{fiches détaillées} pour chaque filière (programme, débouchés, compétences).
+\end{enumerate}
+
+\section{Présentation des Filières}
+
+L'application couvre les six filières suivantes :
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|>{\columncolor{primary!10}}c|l|l|}
+\hline
+\textbf{Code} & \textbf{Nom Complet} & \textbf{Domaine} \\
+\hline
+GIIA & Génie Informatique et Intelligence Artificielle & IT / Data Science \\
+GTR & Génie Réseaux \& Télécom & Réseaux / Cybersécurité \\
+GINDUS & Génie Industriel & Logistique / Supply Chain \\
+GMSI & Génie Mécatronique et Systèmes Intelligents & Robotique / Embarqué \\
+GPMA & Génie des Procédés \& Matériaux Avancés & Chimie / Environnement \\
+GATE & Génie Aéronautique & Aéronautique / Espace \\
+\hline
+\end{tabular}
+\caption{Les 6 filières d'ingénierie de l'ENSA Safi}
+\end{table}
+
+% ============= Chapter 2: Architecture Technique =============
+\chapter{Architecture Technique}
+
+\section{Stack Technologique}
+
+\begin{infobox}[Technologies Utilisées]
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Backend :} Flask (Python 3.x)
+    \item \textbf{Base de Données :} SQLite3
+    \item \textbf{Frontend :} HTML5, CSS3 (Vanille), JavaScript ES6+
+    \item \textbf{IA / NLP :} Scikit-learn (TF-IDF, Cosine Similarity)
+    \item \textbf{Polices :} Google Fonts (Outfit)
+    \item \textbf{Icônes :} Font Awesome 6
+\end{itemize}
+\end{infobox}
+
+\section{Architecture MVC}
+
+L'application suit le pattern \textbf{Model-View-Controller} (MVC) :
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=2.5cm,
+    box/.style={rectangle, draw=primary, fill=primary!10, rounded corners, minimum height=1.2cm, minimum width=3cm, text centered, font=\bfseries},
+    arrow/.style={-{Stealth[length=3mm]}, thick, primary}
+]
+    % Nodes
+    \node[box] (user) {Utilisateur};
+    \node[box, right=of user] (view) {View\\(Templates Jinja2)};
+    \node[box, right=of view] (controller) {Controller\\(app.py)};
+    \node[box, below=of controller] (model) {Model\\(SQLite DB)};
+    \node[box, below=of view] (chatbot) {Chatbot\\(TF-IDF)};
+    
+    % Arrows
+    \draw[arrow] (user) -- (view);
+    \draw[arrow] (view) -- (controller);
+    \draw[arrow] (controller) -- (model);
+    \draw[arrow] (model) -- (controller);
+    \draw[arrow] (controller) -- (view);
+    \draw[arrow] (view) -- (user);
+    \draw[arrow, dashed, primarydark] (user) |- (chatbot);
+    \draw[arrow, dashed, primarydark] (chatbot) -| (user);
+    
+\end{tikzpicture}
+\end{center}
+
+\section{Structure des Fichiers}
+
+\begin{codebox}[Arborescence du Projet]
+\begin{lstlisting}[language=bash]
+mini-projet/
+|-- app.py                   # Serveur Flask (Routes)
+|-- chatbot.py               # Logique du Chatbot (TF-IDF)
+|-- ensa_orientation.db      # Base de donnees SQLite
+|-- schema.sql               # Schema de creation de la DB
+|-- requirements.txt         # Dependances Python
+|-- static/
+|   `-- css/
+|       `-- style.css        # Styles CSS (~1000 lignes)
+`-- templates/
+    |-- base.html            # Template de base (header, footer, chatbot)
+    |-- index.html           # Page d'accueil (Hero, Cards)
+    |-- questionnaire.html   # Test d'orientation
+    `-- filiere_detail.html  # Fiche detaillee d'une filiere
+\end{lstlisting}
+\end{codebox}
+
+% ============= Chapter 3: Base de Données =============
+\chapter{Base de Données}
+
+\section{Schéma Relationnel}
+
+La base de données SQLite contient deux tables principales :
+
+\begin{center}
+\begin{tikzpicture}[
+    table/.style={rectangle, draw=primarydark, fill=white, rounded corners=3pt, minimum width=6cm},
+    header/.style={rectangle, fill=primary, text=white, font=\bfseries, minimum width=6cm, minimum height=0.7cm},
+    field/.style={font=\ttfamily\small}
+]
+    % Table Filieres
+    \node[table] (filieres) at (0,0) {
+        \begin{tabular}{ll}
+            \texttt{id} & INTEGER (PK) \\
+            \texttt{code} & TEXT (UNIQUE) \\
+            \texttt{nom} & TEXT \\
+            \texttt{description} & TEXT \\
+            \texttt{debouches} & TEXT \\
+            \texttt{mots\_cles} & TEXT \\
+            \texttt{formation\_json} & TEXT (JSON) \\
+        \end{tabular}
+    };
+    \node[header, above=0pt of filieres.north, anchor=south] {filieres};
+    
+    % Table Questions
+    \node[table] (questions) at (8,0) {
+        \begin{tabular}{ll}
+            \texttt{id} & INTEGER (PK) \\
+            \texttt{texte} & TEXT \\
+            \texttt{categorie} & TEXT \\
+            \texttt{poids\_json} & TEXT (JSON) \\
+        \end{tabular}
+    };
+    \node[header, above=0pt of questions.north, anchor=south] {questions};
+    
+\end{tikzpicture}
+\end{center}
+
+\section{Système de Pondération}
+
+Chaque question du test est associée à un \textbf{vecteur de poids} (JSON) qui indique son influence sur chaque filière.
+
+\begin{infobox}[Exemple de Pondération]
+\textbf{Question :} \textit{"J'aime résoudre des problèmes algorithmiques complexes."}\\[0.3cm]
+\textbf{Poids :} \texttt{\{"GIIA": 5, "GMSI": 2, "GTR": 1\}}\\[0.3cm]
+\textbf{Interprétation :} Une réponse élevée (4-5) à cette question favorisera fortement la filière GIIA.
+\end{infobox}
+
+\subsection{Formule de Calcul des Scores}
+
+Pour chaque filière $f$, le score total est calculé comme suit :
+
+\[
+\text{Score}_f = \sum_{q \in Q} \text{Réponse}_q \times \text{Poids}_{q,f}
+\]
+
+Où :
+\begin{itemize}
+    \item $Q$ est l'ensemble des questions
+    \item $\text{Réponse}_q \in \{1, 2, 3, 4, 5\}$ est la réponse de l'utilisateur
+    \item $\text{Poids}_{q,f}$ est le poids de la question $q$ pour la filière $f$
+\end{itemize}
+
+% ============= Chapter 4: Module Chatbot =============
+\chapter{Module Chatbot}
+
+\section{Technologie : TF-IDF et Similarité Cosinus}
+
+Le chatbot utilise une approche basée sur la \textbf{recherche d'information} (Information Retrieval) pour trouver la réponse la plus pertinente dans sa base de connaissances.
+
+\subsection{Algorithme}
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Vectorisation TF-IDF :} Transformation des questions de la knowledge base en vecteurs numériques.
+    \item \textbf{Transformation de l'input :} La question de l'utilisateur est également vectorisée.
+    \item \textbf{Calcul de similarité :} Utilisation de la \textbf{similarité cosinus} entre l'input et chaque question.
+    \item \textbf{Sélection :} La réponse associée à la question ayant la plus haute similarité est retournée (si > seuil 0.3).
+\end{enumerate}
+
+\begin{codebox}[Extrait de chatbot.py]
+\begin{lstlisting}[language=Python]
+def get_response(self, user_input):
+    user_vec = self.vectorizer.transform([user_input])
+    similarities = cosine_similarity(user_vec, self.tfidf_matrix)
+    best_idx = np.argmax(similarities)
+    score = similarities[0][best_idx]
+    
+    if score > 0.3:
+        return self.answers[best_idx]
+    else:
+        return "Je ne suis pas sur de comprendre..."
+\end{lstlisting}
+\end{codebox}
+
+\section{Base de Connaissances}
+
+Le chatbot dispose d'une base de 12 paires question/réponse couvrant :
+\begin{itemize}
+    \item Salutations
+    \item Descriptions des 6 filières
+    \item Débouchés professionnels
+    \item Conseils d'orientation
+\end{itemize}
+
+% ============= Chapter 5: Interface Utilisateur =============
+\chapter{Interface Utilisateur}
+
+\section{Design System}
+
+L'interface suit un \textbf{Design System} cohérent basé sur le thème marron de l'ENSA Safi.
+
+\subsection{Palette de Couleurs}
+
+\begin{center}
+\begin{tikzpicture}
+    \foreach \color/\name/\hex [count=\i from 0] in {
+        primary/Primary/\#CA6F1E,
+        primarydark/Primary Dark/\#A04000,
+        textmain/Text Main/\#1E293B,
+        textlight/Text Light/\#64748B,
+        background/Background/\#F8FAFC
+    } {
+        \fill[\color] (\i*2.8, 0) rectangle ++(2.5, 1.5);
+        \node[below, font=\small\bfseries] at (\i*2.8+1.25, 0) {\name};
+        \node[below, font=\tiny\ttfamily, text=textlight] at (\i*2.8+1.25, -0.4) {\hex};
+    }
+\end{tikzpicture}
+\end{center}
+
+\subsection{Composants UI}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Navbar :} Glassmorphism avec backdrop-filter blur.
+    \item \textbf{Hero Section :} Gradient subtil, animations float, statistiques.
+    \item \textbf{Cards :} Bordures arrondies (24px), ombres portées, hover avec transformation Y.
+    \item \textbf{Boutons :} Gradient marron, effet shadow-hover.
+    \item \textbf{Chatbot Widget :} Fenêtre flottante en bas à droite.
+\end{itemize}
+
+\section{Responsive Design}
+
+L'application utilise des \textbf{Media Queries CSS} pour s'adapter aux différentes tailles d'écran :
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Device} & \textbf{Breakpoint} & \textbf{Adaptations} \\
+\hline
+Desktop & > 1200px & Grille 3 colonnes pour les cartes \\
+Tablet & 768px - 1200px & Grille 2 colonnes, Hero empilé \\
+Mobile & < 768px & Layout colonne unique, menu hamburger \\
+\hline
+\end{tabular}
+\caption{Points de rupture responsive}
+\end{table}
+
+% ============= Chapter 6: Fonctionnalités =============
+\chapter{Fonctionnalités Clés}
+
+\section{Test d'Orientation Intelligent}
+
+\begin{enumerate}[leftmargin=*]
+    \item L'utilisateur répond à 6 questions sur une échelle de Likert (1-5).
+    \item Les réponses sont envoyées via \textbf{Fetch API} au backend.
+    \item Le serveur calcule les scores pondérés pour chaque filière.
+    \item Les \textbf{Top 3 filières} sont affichées avec leurs scores.
+\end{enumerate}
+
+\section{Fiches Filières Détaillées}
+
+Chaque filière dispose d'une page complète avec :
+\begin{itemize}
+    \item Description et objectifs
+    \item Débouchés professionnels (affichés en tags)
+    \item Mots-clés / compétences (affichés en hashtags)
+    \item Programme de formation sur 3 ans (timeline visuelle)
+\end{itemize}
+
+\section{Chatbot Intégré}
+
+Le widget de chat permet aux utilisateurs de poser des questions directement depuis n'importe quelle page. Exemples de questions supportées :
+\begin{itemize}
+    \item "C'est quoi GIIA ?"
+    \item "Quels sont les débouchés de GTR ?"
+    \item "Comment choisir ma filière ?"
+\end{itemize}
+
+% ============= Chapter 7: Conclusion =============
+\chapter{Conclusion et Perspectives}
+
+\section{Bilan}
+
+Le projet \textbf{ENSAGuide} répond efficacement à la problématique d'orientation des étudiants en proposant :
+\begin{itemize}
+    \item Une interface \textbf{moderne et intuitive}.
+    \item Un test d'orientation \textbf{basé sur des critères objectifs}.
+    \item Un chatbot \textbf{intelligent} pour l'assistance instantanée.
+    \item Des fiches filières \textbf{complètes et structurées}.
+\end{itemize}
+
+\section{Améliorations Futures}
+
+\begin{infobox}[Pistes d'Amélioration]
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Machine Learning avancé :} Utiliser un modèle de classification supervisé entraîné sur des données réelles d'étudiants.
+    \item \textbf{Authentification :} Permettre aux étudiants de créer un compte pour sauvegarder leurs résultats.
+    \item \textbf{Chatbot LLM :} Intégrer un modèle de langage (GPT, LLaMA) pour des réponses plus naturelles.
+    \item \textbf{Tableau de bord admin :} Interface pour ajouter/modifier des filières et questions.
+    \item \textbf{Multilingue :} Support de l'arabe et de l'anglais.
+\end{enumerate}
+\end{infobox}
+
+\vfill
+
+\begin{center}
+\textcolor{primary}{\rule{0.5\textwidth}{1pt}}\\[0.5cm]
+{\large\textit{Fin du Rapport}}\\[0.3cm]
+{\small ENSA Safi - 2025/2026}
+\end{center}
+
+\end{document}

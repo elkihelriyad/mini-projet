@@ -1,0 +1,394 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1>Gestion des Utilisateurs</h1>
+        <p>Gérez les comptes étudiants, suivez leur progression et modérez l'accès.</p>
+    </div>
+    <div style="display: flex; gap: 1rem;">
+        <button class="btn btn-outline">
+            <i class="fas fa-download"></i> Exporter CSV
+        </button>
+        <button class="btn btn-primary" onclick="openAddStudentModal()">
+            <i class="fas fa-plus"></i> Ajouter un étudiant
+        </button>
+    </div>
+</div>
+
+<div class="filters-bar">
+    <i class="fas fa-search" style="color: var(--text-light);"></i>
+    <input type="text" id="searchInput" class="search-input" placeholder="Rechercher par nom, email..."
+        onkeyup="filterTable()">
+
+    <select id="filiereFilter" onchange="filterTable()">
+        <option value="">Toutes les Filières</option>
+        <option value="GIIA">GIIA</option>
+        <option value="GINDUS">Génie Industriel</option>
+        <option value="GTR">GTR</option>
+        <option value="GATE">GATE</option>
+        <option value="GPMA">GPMA</option>
+        <option value="GMSI">GMSI</option>
+    </select>
+
+    <select id="statusFilter" onchange="filterTable()">
+        <option value="">Tous les status</option>
+        <option value="Actif">Actif</option>
+        <option value="Inactif">Inactif</option>
+    </select>
+</div>
+
+<div class="table-container">
+    <table id="usersTable">
+        <thead>
+            <tr>
+                <th>Étudiant</th>
+                <th>Filière Tendance</th>
+                <th>Tests Passés</th>
+                <th>Statut</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in users_list %}
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="avatar"
+                            style="background: {{ student.avatar_color|default('#e2e8f0') }}; color: #475569;">{{
+                            student.initials }}</div>
+                        <div>
+                            <div style="font-weight: 600;">{{ student.name }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-light);">{{ student.email }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    {% if student.trend_filiere %}
+                    <span class="filiere-tag"
+                        style="background: {{ student.trend_bg }}; color: {{ student.trend_color }}">
+                        <i class="{{ student.trend_icon }}"></i> {{ student.trend_filiere }}
+                    </span>
+                    {% else %}
+                    <span class="filiere-tag"><i class="far fa-question-circle"></i> Indécis</span>
+                    {% endif %}
+                </td>
+                <td style="font-weight: 600;">{{ student.test_count }}</td>
+                <td>
+                    {% if student.active %}
+                    <span id="status-badge-{{ student.id }}" class="status-badge status-active">● Actif</span>
+                    {% else %}
+                    <span id="status-badge-{{ student.id }}" class="status-badge status-inactive">● Inactif</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">
+                    <i id="toggle-{{ student.id }}"
+                        class="fas {{ 'fa-toggle-on' if student.active else 'fa-toggle-off' }}"
+                        style="color: {{ 'var(--primary)' if student.active else 'var(--text-light)' }}; font-size: 1.2rem; cursor: pointer;"
+                        onclick="toggleUser({{ student.id }})"></i>
+
+                    <i class="fas fa-key"
+                        style="color: #3b82f6; font-size: 1.1rem; cursor: pointer; margin-left: 1rem; transition: color 0.2s;"
+                        onmouseover="this.style.color='#1d4ed8'" onmouseout="this.style.color='#3b82f6'"
+                        onclick="openPasswordModal({{ student.id }}, '{{ student.nom_complet or student.email }}')"></i>
+
+                    <i class="fas fa-trash-alt"
+                        style="color: #ef4444; font-size: 1.1rem; cursor: pointer; margin-left: 1rem; transition: color 0.2s;"
+                        onmouseover="this.style.color='#b91c1c'" onmouseout="this.style.color='#ef4444'"
+                        onclick="deleteUser({{ student.id }})"></i>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="margin-top: 1rem; color: var(--text-light); font-size: 0.9rem;">
+    Affichage de <strong>{{ users_list|length }}</strong> étudiants
+</div>
+
+<!-- Add Student Modal -->
+<div id="addStudentModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div
+        style="background: white; width: 400px; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: slideIn 0.3s ease;">
+        <h2 style="margin-top: 0; color: var(--text-main); margin-bottom: 1.5rem;">Ajouter un étudiant</h2>
+
+        <form id="addStudentForm" onsubmit="submitAddStudent(event)">
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">Nom
+                    Complet</label>
+                <input type="text" id="studentName" required placeholder="Ex: Mohamed Alami"
+                    style="width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Outfit', sans-serif;">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">Email
+                    Académique</label>
+                <input type="email" id="studentEmail" required placeholder="nom@uca.ac.ma"
+                    style="width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Outfit', sans-serif;">
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">Code
+                    d'accès</label>
+                <input type="text" id="studentCode" required placeholder="Code unique"
+                    style="width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Outfit', sans-serif;">
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button type="button" onclick="closeAddStudentModal()"
+                    style="padding: 0.8rem 1.5rem; background: transparent; border: 1px solid #e2e8f0; border-radius: 8px; color: var(--text-light); cursor: pointer; font-weight: 600;">
+                    Annuler
+                </button>
+                <button type="submit"
+                    style="padding: 0.8rem 1.5rem; background: var(--primary); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">
+                    Créer le compte
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+
+<!-- Change Password Modal -->
+<div id="passwordModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div
+        style="background: white; width: 400px; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: slideIn 0.3s ease;">
+        <h2 style="margin-top: 0; color: var(--text-main); margin-bottom: 0.5rem;">Modifier le mot de passe</h2>
+        <p id="passwordModalUser" style="color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.9rem;"></p>
+
+        <form id="passwordForm" onsubmit="submitPasswordChange(event)">
+            <input type="hidden" id="passwordUserId">
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">Nouveau
+                    Code d'accès</label>
+                <input type="text" id="newPassword" required placeholder="Nouveau code"
+                    style="width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Outfit', sans-serif;">
+                <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> Le mot de passe ne peut pas être vu, seulement réinitialisé.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button type="button" onclick="closePasswordModal()"
+                    style="padding: 0.8rem 1.5rem; background: transparent; border: 1px solid #e2e8f0; border-radius: 8px; color: var(--text-light); cursor: pointer; font-weight: 600;">
+                    Annuler
+                </button>
+                <button type="submit"
+                    style="padding: 0.8rem 1.5rem; background: #3b82f6; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function filterTable() {
+        // Simple client-side filtering
+        const input = document.getElementById("searchInput");
+        const filterStr = input.value.toUpperCase();
+
+        const filiereSelect = document.getElementById("filiereFilter");
+        const filiereFilter = filiereSelect.value.toUpperCase();
+
+        const table = document.getElementById("usersTable");
+        const tr = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < tr.length; i++) {
+            let nameCol = tr[i].getElementsByTagName("td")[0];
+            let filiereCol = tr[i].getElementsByTagName("td")[1];
+            let statusCol = tr[i].getElementsByTagName("td")[3];
+
+            if (nameCol && filiereCol) {
+                const txtValue = nameCol.textContent || nameCol.innerText;
+                const filiereValue = filiereCol.textContent || filiereCol.innerText;
+                const statusValue = statusCol.textContent || statusCol.innerText;
+
+                const matchesSearch = txtValue.toUpperCase().indexOf(filterStr) > -1;
+                const matchesFiliere = filiereFilter === "" || filiereValue.toUpperCase().indexOf(filiereFilter) > -1;
+
+                // Add Status Filter Logic (Optional but good to match UI)
+                const statusSelect = document.getElementById("statusFilter");
+                const statusFilter = statusSelect.value.toUpperCase();
+                const matchesStatus = statusFilter === "" || statusValue.toUpperCase().indexOf(statusFilter) > -1;
+
+                if (matchesSearch && matchesFiliere && matchesStatus) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function toggleUser(userId) {
+        if (!confirm("Voulez-vous vraiment changer le statut de cet utilisateur ?")) return;
+
+        fetch(`/api/toggle_user/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const toggleIcon = document.getElementById(`toggle-${userId}`);
+                    const statusBadge = document.getElementById(`status-badge-${userId}`);
+
+                    if (data.new_status === 1) {
+                        // Activate
+                        toggleIcon.classList.remove('fa-toggle-off');
+                        toggleIcon.classList.add('fa-toggle-on');
+                        toggleIcon.style.color = "var(--primary)";
+
+                        statusBadge.classList.remove('status-inactive');
+                        statusBadge.classList.add('status-active');
+                        statusBadge.innerHTML = "● Actif";
+                    } else {
+                        // Deactivate
+                        toggleIcon.classList.remove('fa-toggle-on');
+                        toggleIcon.classList.add('fa-toggle-off');
+                        toggleIcon.style.color = "var(--text-light)";
+
+                        statusBadge.classList.remove('status-active');
+                        statusBadge.classList.add('status-inactive');
+                        statusBadge.innerHTML = "● Inactif";
+                    }
+                } else {
+                    alert("Erreur lors de la mise à jour du statut.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Une erreur est survenue.");
+            });
+    }
+    // Modal Logic
+    function openAddStudentModal() {
+        document.getElementById('addStudentModal').style.display = 'flex';
+    }
+
+    function closeAddStudentModal() {
+        document.getElementById('addStudentModal').style.display = 'none';
+        document.getElementById('addStudentForm').reset();
+    }
+
+    function submitAddStudent(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('studentName').value;
+        const email = document.getElementById('studentEmail').value;
+        const code = document.getElementById('studentCode').value;
+
+        // Basic validation
+        if (!email.endsWith('@uca.ac.ma')) {
+            alert('L\'email doit être une adresse académique (@uca.ac.ma)');
+            return;
+        }
+
+        fetch('/api/add_student', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: name, email: email, code: code })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Étudiant ajouté avec succès !');
+                    location.reload(); // Refresh to show new student
+                } else {
+                    alert('Erreur: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erreur lors de la création du compte.');
+            });
+    }
+
+    function deleteUser(userId) {
+        if (!confirm("Voulez-vous vraiment supprimer cet utilisateur ? Cette action est irréversible.")) return;
+
+        fetch(`/api/delete_user/${userId}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Find and remove the table row
+                    const btn = document.getElementById(`toggle-${userId}`);
+                    if (btn) {
+                        const row = btn.closest('tr');
+                        row.remove();
+                    }
+                } else {
+                    alert('Erreur: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erreur lors de la suppression.');
+            });
+    }
+
+    // Password Modal Logic
+    function openPasswordModal(userId, userName) {
+        document.getElementById('passwordModal').style.display = 'flex';
+        document.getElementById('passwordUserId').value = userId;
+        document.getElementById('passwordModalUser').innerText = `Étudiant: ${userName}`;
+    }
+
+    function closePasswordModal() {
+        document.getElementById('passwordModal').style.display = 'none';
+        document.getElementById('passwordForm').reset();
+    }
+
+    function submitPasswordChange(event) {
+        event.preventDefault();
+
+        const userId = document.getElementById('passwordUserId').value;
+        const newCode = document.getElementById('newPassword').value;
+
+        if (!newCode) return;
+
+        fetch('/api/update_password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user_id: userId, code: newCode })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Mot de passe mis à jour avec succès.');
+                    closePasswordModal();
+                } else {
+                    alert('Erreur: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erreur lors de la mise à jour.');
+            });
+    }
+
+    // Close modal on outside click
+    window.onclick = function (event) {
+        const modal1 = document.getElementById('addStudentModal');
+        const modal2 = document.getElementById('passwordModal');
+        if (event.target == modal1) {
+            closeAddStudentModal();
+        }
+        if (event.target == modal2) {
+            closePasswordModal();
+        }
+    }
+</script>
+{% endblock %}

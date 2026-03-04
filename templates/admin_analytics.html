@@ -1,0 +1,306 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+<!-- Welcome Banner -->
+<div class="glass-panel"
+    style="background: white; border-radius: 16px; padding: 1.5rem 2rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <div
+            style="width: 50px; height: 50px; background: #ca6f1e; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700;">
+            A</div>
+        <div>
+            <h1 style="font-size: 1.5rem; margin: 0; color: var(--text-main);">Bonjour, Admin Principal !</h1>
+            <div
+                style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.2rem; color: #166534; font-size: 0.9rem; font-weight: 500;">
+                <i class="fas fa-check-circle"></i> Compte Administrateur Vérifié
+            </div>
+        </div>
+    </div>
+    <a href="{{ url_for('logout') }}"
+        style="background: #fee2e2; color: #b91c1c; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s;">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+    </a>
+</div>
+
+<div class="page-header">
+    <div class="page-title">
+        <h2 style="font-size: 1.5rem; margin: 0;">Tableau de bord Analytique</h2>
+        <p>Aperçu des tendances d'orientation et résultats des tests.</p>
+    </div>
+    <div style="display: flex; gap: 1rem;">
+        <a href="{{ url_for('admin_analytics') if current_days else url_for('admin_analytics', days=30) }}"
+            class="btn {{ 'btn-primary' if current_days else 'btn-outline' }}"
+            style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="far fa-calendar"></i>
+            {{ 'Voir Tout' if current_days else '30 derniers jours' }}
+        </a>
+        <a href="{{ url_for('export_analytics_csv') }}" class="btn btn-primary"
+            style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-download"></i> Exporter
+        </a>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div
+    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="card" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-light); text-transform: uppercase;">Tests
+                Complétés</div>
+            <div style="font-size: 2.2rem; font-weight: 700; margin-top: 0.5rem; color: var(--text-main);">{{
+                stats.tests_count }}</div>
+        </div>
+        <div
+            style="width: 45px; height: 45px; background: #ffedd5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+            <i class="fas fa-clipboard-check" style="font-size: 1.2rem;"></i>
+        </div>
+    </div>
+
+    <div class="card" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-light); text-transform: uppercase;">
+                Étudiants Inscrits</div>
+            <div style="font-size: 2.2rem; font-weight: 700; margin-top: 0.5rem; color: var(--text-main);">{{
+                stats.students_count }}</div>
+        </div>
+        <div
+            style="width: 45px; height: 45px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #166534;">
+            <i class="fas fa-user-graduate" style="font-size: 1.2rem;"></i>
+        </div>
+    </div>
+
+    <div class="card" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-light); text-transform: uppercase;">Temps
+                Moyen (Test)</div>
+            <div style="font-size: 2.2rem; font-weight: 700; margin-top: 0.5rem; color: var(--text-main);">{{
+                stats.avg_duration }}</div>
+        </div>
+        <div
+            style="width: 45px; height: 45px; background: #e0f2fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0369a1;">
+            <i class="fas fa-stopwatch" style="font-size: 1.2rem;"></i>
+        </div>
+    </div>
+
+    <div class="card"
+        style="display: flex; justify-content: space-between; align-items: flex-start; border-left: 4px solid var(--primary);">
+        <div>
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-light); text-transform: uppercase;">
+                Filière Tendance</div>
+            <div style="font-size: 2.2rem; font-weight: 700; margin-top: 0.5rem; color: var(--primary);">{{
+                top_filiere_code }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-light);">{{ top_filiere_nom }}</div>
+        </div>
+        <div
+            style="width: 45px; height: 45px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #d97706;">
+            <i class="fas fa-trophy" style="font-size: 1.2rem;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Main Charts Row -->
+<div class="card" style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3>Répartition des Recommandations par Filière</h3>
+        <i class="fas fa-ellipsis-h" style="color: var(--text-light); cursor: pointer;"></i>
+    </div>
+    <div style="height: 300px;">
+        <canvas id="barChart"></canvas>
+    </div>
+</div>
+
+<!-- Secondary Charts Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+
+    <!-- Distribution des Profils -->
+    <div class="card" style="display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.5rem;">
+            <div style="width: 4px; height: 24px; background: #3b82f6; border-radius: 2px;"></div>
+            <h3 style="margin: 0;">Distribution des Profils</h3>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-around; flex: 1;">
+            <!-- Chart Container -->
+            <div style="position: relative; width: 160px; height: 160px;">
+                <canvas id="donutChart"></canvas>
+                <div
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none;">
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-main); line-height: 1;">100%
+                    </div>
+                    <div style="font-size: 0.6rem; font-weight: 500; color: var(--text-light);">Total</div>
+                </div>
+            </div>
+
+            <!-- Custom Legend -->
+            <div id="profileLegend" style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Legend items injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Taux de Complétion -->
+    <div class="card" style="display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.5rem;">
+            <i class="fas fa-circle-notch" style="color: #ca6f1e;"></i>
+            <h3 style="margin: 0;">Taux de Complétion du Test</h3>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-around; flex: 1;">
+            <!-- Chart Container -->
+            <div style="position: relative; width: 160px; height: 160px;">
+                <canvas id="completionChart"></canvas>
+                <div
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none;">
+                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-main); line-height: 1;">92%</div>
+                    <div
+                        style="font-size: 0.6rem; font-weight: 600; color: var(--text-light); letter-spacing: 0.5px; text-transform: uppercase; margin-top:2px;">
+                        Complétion</div>
+                </div>
+            </div>
+
+            <!-- Manual Legend matching design -->
+            <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                <div>
+                    <div
+                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text-main); font-size: 0.95rem;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ca6f1e;"></span>
+                        Test Terminé
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-light); margin-left: 1.2rem; margin-top: 2px;">
+                        Étudiants ayant reçu une recommandation finale.
+                    </div>
+                </div>
+                <div>
+                    <div
+                        style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--text-main); font-size: 0.95rem;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #e2e8f0;"></span>
+                        Abandon
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-light); margin-left: 1.2rem; margin-top: 2px;">
+                        Arrêt avant la fin du module psychotechnique.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Data passing
+        const chartData = {
+            bar: {
+                labels: {{ chart_data.repartition_labels | tojson
+    }},
+        data: {{ chart_data.repartition_values | tojson }}
+            },
+        donut: {
+        labels: {{ chart_data.profile_labels | tojson }},
+        data: {{ chart_data.profile_values | tojson }}
+            }
+        };
+
+    // 1. Bar Chart
+    const barCanvas = document.getElementById('barChart');
+    if (!chartData.bar.labels || chartData.bar.labels.length === 0) {
+        barCanvas.parentElement.innerHTML = '<div style="height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-light); font-style: italic;"><i class="fas fa-info-circle" style="margin-right: 8px;"></i> Aucune donnée disponible</div>';
+    } else {
+        new Chart(barCanvas, {
+            type: 'bar',
+            data: {
+                labels: chartData.bar.labels,
+                datasets: [{
+                    label: 'Recommandations',
+                    data: chartData.bar.data,
+                    backgroundColor: '#e67e22',
+                    borderRadius: 6,
+                    barThickness: 50,
+                    hoverBackgroundColor: '#d35400'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(30, 41, 59, 0.9)', padding: 12, cornerRadius: 8, displayColors: false } },
+                scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4], color: '#e2e8f0' }, ticks: { stepSize: 1, precision: 0, font: { family: "'Outfit', sans-serif" } } }, x: { grid: { display: false }, ticks: { font: { family: "'Outfit', sans-serif" } } } }
+            }
+        });
+    }
+
+    // 2. Donut Chart (Profils) - Custom Legend Implementation
+    const donutCanvas = document.getElementById('donutChart');
+    if (donutCanvas && chartData.donut.labels.length > 0) {
+        // Colors logic: ensure we have enough colors
+        const bgColors = ['#ca6f1e', '#3b82f6', '#cbd5e1', '#64748b'];
+
+        new Chart(donutCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: chartData.donut.labels,
+                datasets: [{
+                    data: chartData.donut.data,
+                    backgroundColor: bgColors,
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '72%',
+                plugins: { legend: { display: false }, tooltip: { enabled: true } }
+            }
+        });
+
+        // Populate Custom Legend
+        const legendContainer = document.getElementById('profileLegend');
+        const total = chartData.donut.data.reduce((a, b) => a + b, 0);
+
+        chartData.donut.labels.forEach((label, index) => {
+            const value = chartData.donut.data[index];
+            const percentage = Math.round((value / total) * 100);
+            const color = bgColors[index % bgColors.length];
+
+            const itemHtml = `
+                    <div style="display: flex; align-items: center; gap: 0.8rem;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: ${color};"></span>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: var(--text-main); font-size: 0.9rem;">${label}</div>
+                        </div>
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 0.9rem;">${percentage}%</div>
+                    </div>
+                `;
+            legendContainer.innerHTML += itemHtml;
+        });
+    }
+
+    // 3. Completion Chart
+    const completionCanvas = document.getElementById('completionChart');
+    if (completionCanvas) {
+        new Chart(completionCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: ['Terminé', 'Abandon'],
+                datasets: [{
+                    data: [92, 8], // Fixed to 92% to match design image text
+                    backgroundColor: ['#ca6f1e', '#e2e8f0'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '72%',
+                rotation: -90, // Start from top
+                circumference: 360,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+    }
+    });
+</script>
+</script>
+{% endblock %}

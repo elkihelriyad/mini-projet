@@ -1,0 +1,609 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion - ENSA Safi{% endblock %}
+
+{% block content %}
+<div class="login-page-wrapper">
+    <!-- Animated Background Elements -->
+    <div class="mesh-background">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card glass-panel">
+            <div class="card-header">
+                <div class="header-main">
+                    <div class="brand-badge">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h1>Espace Étudiant</h1>
+                </div>
+            </div>
+
+            <!-- Error Messages Moved Here -->
+            {% if error %}
+            <div class="alert-box error" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-exclamation-triangle"></i> {{ error }}
+            </div>
+            {% endif %}
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert-box info" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-info-circle"></i> {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form class="login-form" method="POST" onsubmit="return validateLogin(event)" novalidate>
+                <!-- Email Field -->
+                <div class="input-group" id="emailGroup">
+                    <label for="email">Identifiant Académique</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-university input-icon"></i>
+                        <input type="email" id="email" name="email" placeholder="@uca.ac.ma" autocomplete="username"
+                            required oninput="handleEmailInput(this)" onblur="handleEmailBlur(this)">
+                        <div class="status-icon">
+                            <i class="fas fa-check-circle success-mark"></i>
+                            <i class="fas fa-exclamation-circle error-mark"></i>
+                        </div>
+                    </div>
+                    <div class="input-footer">
+                        <span class="hint-text">L'email doit se terminer par <strong>@uca.ac.ma</strong></span>
+                        <span class="error-text">Domaine institutionnel requis</span>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="input-group">
+                    <label for="password">Code d'accès</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key input-icon"></i>
+                        <input type="password" id="password" name="password" placeholder="Votre code fourni" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword()" tabindex="-1"
+                            aria-label="Afficher le mot de passe">
+                            <i class="fas fa-eye-slash" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+
+
+                <button type="submit" class="btn-submit">
+                    <span>Se Connecter</span>
+                    <div class="btn-shine"></div>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="card-footer">
+                <p>Problème de connexion ? <a href="mailto:ensas@uca.ac.ma">Contacter le support</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // UX Logic
+    function handleEmailInput(input) {
+        const group = document.getElementById('emailGroup');
+        const val = input.value.trim().toLowerCase();
+
+        // Reset error state on typing
+        if (group.classList.contains('has-error')) {
+            group.classList.remove('has-error');
+        }
+
+        // Live success check: Allow @uca.ac.ma OR ensas.uca.ma
+        if (val.length > 5 && (val.endsWith('@uca.ac.ma') || val.endsWith('ensas.uca.ma'))) {
+            group.classList.add('is-valid');
+        } else {
+            group.classList.remove('is-valid');
+        }
+    }
+
+    function handleEmailBlur(input) {
+        const val = input.value.trim();
+        if (val.length > 0 && !(val.endsWith('@uca.ac.ma') || val.endsWith('ensas.uca.ma'))) {
+            document.getElementById('emailGroup').classList.add('has-error');
+        }
+    }
+
+    function togglePassword() {
+        const input = document.getElementById('password');
+        const icon = document.getElementById('toggleIcon');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    }
+
+    function validateLogin(event) {
+        // Validation logic
+        const emailInput = document.getElementById('email');
+        const emailVal = emailInput.value.trim();
+        const group = document.getElementById('emailGroup');
+        const card = document.querySelector('.login-card');
+
+        if (!emailVal.endsWith('@uca.ac.ma') && !emailVal.endsWith('ensas.uca.ma')) {
+            event.preventDefault(); // Stop submission only if invalid
+            group.classList.add('has-error');
+            emailInput.focus();
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 400);
+            return false;
+        }
+
+        // Show loading state
+        const btn = document.querySelector('.btn-submit');
+        btn.classList.add('is-loading');
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Connexion...';
+
+        // Allow form to submit naturally
+        return true;
+    }
+</script>
+
+<style>
+    /* Premium Login Styles */
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.6);
+        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        --input-bg: #f8fafc;
+        --input-focus-ring: rgba(202, 111, 30, 0.15);
+        --text-secondary: #64748b;
+    }
+
+    .login-page-wrapper {
+        min-height: calc(100vh - 80px);
+        /* Adjust for navbar offset */
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        background-color: #fcfbf9;
+        /* Very warm light gray */
+        padding-top: 80px;
+        /* Offset for navbar */
+        margin-bottom: 0;
+    }
+
+    footer {
+        margin-top: 0 !important;
+    }
+
+    /* Ambient Background */
+    .mesh-background {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.6;
+        animation: floatOrb 20s infinite ease-in-out;
+    }
+
+    .orb-1 {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(202, 111, 30, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+        top: -10%;
+        left: -10%;
+        animation-delay: 0s;
+    }
+
+    .orb-2 {
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(217, 119, 6, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+        bottom: -20%;
+        right: -10%;
+        animation-delay: -5s;
+    }
+
+    .orb-3 {
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(202, 111, 30, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation-delay: -10s;
+    }
+
+    @keyframes floatOrb {
+
+        0%,
+        100% {
+            transform: translate(0, 0);
+        }
+
+        33% {
+            transform: translate(30px, -50px);
+        }
+
+        66% {
+            transform: translate(-20px, 20px);
+        }
+    }
+
+    .login-container {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        z-index: 10;
+        padding: 15px;
+        margin-top: 5rem;
+    }
+
+    /* Glass Card */
+    .login-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.05),
+            0 10px 30px -10px rgba(202, 111, 30, 0.05);
+        /* Tinted shadow */
+        border-radius: 30px;
+        padding: 4rem 2rem;
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Header */
+    .card-header {
+        text-align: center;
+        margin-bottom: 3.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .header-main {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .brand-badge {
+        width: 54px;
+        height: 54px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        box-shadow: 0 10px 20px rgba(202, 111, 30, 0.2);
+        transform: rotate(-5deg);
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .login-card:hover .brand-badge {
+        transform: rotate(0) scale(1.05);
+    }
+
+    .card-header h1 {
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: -0.5px;
+        margin: 0;
+    }
+
+    /* Form Elements */
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .input-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 0.6rem;
+        margin-left: 0.2rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 1.15rem 1rem 1.15rem 3rem;
+        border: 2px solid transparent;
+        background-color: var(--input-bg);
+        border-radius: 14px;
+        font-size: 1rem;
+        color: var(--text-main);
+        transition: all 0.3s ease;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .input-wrapper input:focus {
+        outline: none;
+        background-color: white;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px var(--input-focus-ring);
+    }
+
+    .input-wrapper .input-icon {
+        position: absolute;
+        left: 1.2rem;
+        color: #94a3b8;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+        pointer-events: none;
+    }
+
+    .input-wrapper input:focus+.input-icon,
+    .input-wrapper input:focus~.input-icon {
+        color: var(--primary);
+    }
+
+    /* Validation Icons */
+    .status-icon {
+        position: absolute;
+        right: 1rem;
+        display: flex;
+        align-items: center;
+        pointer-events: none;
+    }
+
+    .status-icon i {
+        font-size: 1.1rem;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: none;
+    }
+
+    .input-group.is-valid .success-mark {
+        opacity: 1;
+        transform: scale(1);
+        color: var(--success);
+        display: block;
+    }
+
+    .input-group.is-valid input {
+        border-color: var(--success);
+        background-color: #f0fdf4;
+    }
+
+    .input-group.has-error .error-mark {
+        opacity: 1;
+        transform: scale(1);
+        color: #ef4444;
+        display: block;
+    }
+
+    .input-group.has-error input {
+        border-color: #ef4444;
+        background-color: #fef2f2;
+        color: #ef4444;
+    }
+
+    .input-group.has-error .input-icon {
+        color: #ef4444;
+    }
+
+    /* Footer / Helper Text */
+    .input-footer {
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        min-height: 1.2em;
+        margin-left: 0.2rem;
+    }
+
+    .hint-text {
+        color: var(--text-secondary);
+        display: block;
+    }
+
+    .error-text {
+        color: #ef4444;
+        font-weight: 500;
+        display: none;
+    }
+
+    .input-group.has-error .hint-text {
+        display: none;
+    }
+
+    .input-group.has-error .error-text {
+        display: block;
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Alert Box */
+    .alert-box {
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-top: -0.5rem;
+    }
+
+    .alert-box.error {
+        background: #fef2f2;
+        border: 1px solid #fee2e2;
+        color: #ef4444;
+    }
+
+    .alert-box.info {
+        background: #f0f9ff;
+        border: 1px solid #e0f2fe;
+        color: #0ea5e9;
+    }
+
+    /* Password Toggle */
+    .password-toggle {
+        position: absolute;
+        right: 0.5rem;
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: color 0.2s;
+        border-radius: 8px;
+    }
+
+    .password-toggle:hover {
+        color: var(--text-main);
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Submit Button */
+    .btn-submit {
+        position: relative;
+        width: 100%;
+        padding: 1.2rem;
+        border: none;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(202, 111, 30, 0.2);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(202, 111, 30, 0.3);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .btn-shine {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
+        transform: skewX(-20deg);
+        animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+        0% {
+            left: -100%;
+        }
+
+        20% {
+            left: 200%;
+        }
+
+        100% {
+            left: 200%;
+        }
+    }
+
+    /* Shake Animation */
+    .shake {
+        animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+    }
+
+    @keyframes shake {
+
+        10%,
+        90% {
+            transform: translate3d(-1px, 0, 0);
+        }
+
+        20%,
+        80% {
+            transform: translate3d(2px, 0, 0);
+        }
+
+        30%,
+        50%,
+        70% {
+            transform: translate3d(-4px, 0, 0);
+        }
+
+        40%,
+        60% {
+            transform: translate3d(4px, 0, 0);
+        }
+    }
+
+    .card-footer {
+        margin-top: 2.5rem;
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding-top: 1.5rem;
+    }
+
+    .card-footer a {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 480px) {
+        .login-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .card-header h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
