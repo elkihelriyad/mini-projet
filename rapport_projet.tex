@@ -1,505 +1,529 @@
-% =============================================================
-% RAPPORT DE PROJET - ENSA Orientation
-% Application Web d'Orientation Académique Intelligente
-% =============================================================
-\documentclass[12pt,a4paper]{report}
+% ============================================================
+% RAPPORT DE PROJET - ENSA Guide
+% Plateforme Web d'Orientation Académique
+% ============================================================
 
-% ============= Package Imports =============
+\documentclass[a4paper,12pt]{article}
+
+% ---- Encodage et langue ----
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
+
+% ---- Mise en page ----
 \usepackage{geometry}
-\geometry{margin=2.5cm}
+\geometry{margin=3.25cm}
 
-% Fonts modernes
-\usepackage{lmodern}
-\usepackage{helvet}
-\renewcommand{\familydefault}{\sfdefault}
+% ---- Mathématiques ----
+\usepackage{amsmath, amssymb}
 
-% Colors
-\usepackage{xcolor}
-\definecolor{primary}{HTML}{CA6F1E}
-\definecolor{primarydark}{HTML}{A04000}
-\definecolor{textmain}{HTML}{1E293B}
-\definecolor{textlight}{HTML}{64748B}
-\definecolor{background}{HTML}{F8FAFC}
-\definecolor{codebg}{HTML}{F1F5F9}
-
-% Graphics
+% ---- Graphiques et tableaux ----
 \usepackage{graphicx}
-\usepackage{tikz}
-\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, shadows.blur}
-
-% Lists and Tables
-\usepackage{enumitem}
-\usepackage{booktabs}
 \usepackage{array}
-\usepackage{longtable}
+\usepackage{booktabs}
 
-% Code listings
-\usepackage{listings}
-\lstset{
-    basicstyle=\ttfamily\small,
-    backgroundcolor=\color{codebg},
-    frame=single,
-    rulecolor=\color{textlight},
-    breaklines=true,
-    showstringspaces=false,
-    keywordstyle=\color{primary}\bfseries,
-    commentstyle=\color{textlight}\itshape,
-    stringstyle=\color{primarydark},
-}
+% ---- Listes ----
+\usepackage{enumitem}
 
-% Hyperlinks
-\usepackage[hidelinks]{hyperref}
+% ---- Hyperliens ----
+\usepackage{hyperref}
 \hypersetup{
     colorlinks=true,
-    linkcolor=primary,
-    urlcolor=primarydark,
-    pdfauthor={ENSA Safi},
-    pdftitle={Rapport de Projet - Orientation Intelligente}
+    linkcolor=black,
+    urlcolor=black,
+    citecolor=black
 }
 
-% Headers and Footers
+% ---- Code source ----
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegray}{gray}{0.95}
+\definecolor{codeblue}{RGB}{0,0,200}
+\definecolor{codegreen}{RGB}{0,120,30}
+\definecolor{codered}{RGB}{180,0,0}
+
+\lstset{
+    language=Python,
+    backgroundcolor=\color{codegray},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{codeblue},
+    commentstyle=\color{codegreen!80!black},
+    stringstyle=\color{codered},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4
+}
+
+\lstdefinelanguage{SQL}{
+    keywords={SELECT, INSERT, UPDATE, DELETE, FROM, WHERE, CREATE, TABLE,
+               INTO, VALUES, DROP, IF, EXISTS, PRIMARY, KEY, NOT, NULL,
+               UNIQUE, INTEGER, TEXT, AUTOINCREMENT, FOREIGN, REFERENCES,
+               DEFAULT, DATETIME},
+    keywordstyle=\color{codeblue},
+    sensitive=false,
+    comment=[l]{--},
+    commentstyle=\color{codegreen},
+    stringstyle=\color{codered},
+    morestring=[b]',
+    morestring=[b]"
+}
+
+% ---- Graphiques pgf ----
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% ---- En-tête et pied de page ----
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\textcolor{textlight}{\small ENSA Safi - Projet Orientation}}
-\fancyhead[R]{\textcolor{textlight}{\small \thepage}}
+\fancyhead[L]{\small\textit{ENSA Guide --- Rapport de Projet}}
+\fancyhead[R]{\small\textit{\thepage}}
 \renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0pt}
 
-% Chapter styling
-\usepackage{titlesec}
-\titleformat{\chapter}[display]
-{\normalfont\huge\bfseries\color{primary}}
-{\chaptertitlename\ \thechapter}{20pt}{\Huge}
-\titleformat{\section}
-{\normalfont\Large\bfseries\color{primarydark}}{\thesection}{1em}{}
-\titleformat{\subsection}
-{\normalfont\large\bfseries\color{textmain}}{\thesubsection}{1em}{}
-
-% Boxes
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-
-\newtcolorbox{infobox}[1][]{
-    colback=background,
-    colframe=primary,
-    title=#1,
-    fonttitle=\bfseries\color{white},
-    coltitle=white,
-    colbacktitle=primary,
-    boxrule=0.5pt,
-    arc=4pt,
-    left=10pt,right=10pt,top=10pt,bottom=10pt,
-    breakable
-}
-
-\newtcolorbox{codebox}[1][]{
-    colback=codebg,
-    colframe=textlight,
-    title=#1,
-    fonttitle=\bfseries\ttfamily,
-    boxrule=0.5pt,
-    arc=2pt,
-    left=5pt,right=5pt,top=5pt,bottom=5pt,
-}
-
-% ============= Document =============
+% ============================================================
 \begin{document}
+% ============================================================
 
-% ============= Title Page =============
+% ---- Page de titre ----
 \begin{titlepage}
-    \begin{tikzpicture}[remember picture, overlay]
-        % Background gradient effect
-        \fill[primary!10] (current page.south west) rectangle (current page.north east);
-        \fill[primary] (current page.north west) rectangle ([yshift=-6cm]current page.north east);
-        
-        % Decorative elements
-        \foreach \i in {1,...,15} {
-            \fill[white, opacity=0.03] (rand*20,-rand*5) circle (rand*2+1);
-        }
-    \end{tikzpicture}
-    
-    \vspace*{-2cm}
-    \begin{center}
-        \textcolor{white}{
-            {\LARGE\bfseries École Nationale des Sciences Appliquées}\\[0.3cm]
-            {\Large de Safi}\\[1cm]
-            \rule{0.5\textwidth}{0.4pt}
-        }
-    \end{center}
-    
-    \vspace{3cm}
-    
-    \begin{center}
-        {\Huge\bfseries\textcolor{primary}{RAPPORT DE PROJET}}\\[0.8cm]
-        {\LARGE\textcolor{textmain}{Application Web d'Orientation}}\\[0.3cm]
-        {\LARGE\textcolor{textmain}{Académique Intelligente}}\\[1.5cm]
-        
-        {\Large\textcolor{primarydark}{\textbf{ENSA}Guide}}\\[0.3cm]
-        {\large\textcolor{textlight}{Système d'aide à la décision pour les étudiants}}
-    \end{center}
-    
+    \centering
+    \vspace*{3cm}
+
+    {\Large\textbf{École Nationale des Sciences Appliquées de Safi}}\\[0.4cm]
+    {\large Université Cadi Ayyad}\\[2cm]
+
+    \rule{\textwidth}{0.8pt}\\[0.5cm]
+    {\LARGE\textbf{Rapport de Projet}}\\[0.3cm]
+    {\large\textit{Plateforme Web d'Orientation Académique}}\\[0.3cm]
+    \rule{\textwidth}{0.8pt}\\[1.5cm]
+
+    {\Huge\textbf{ENSA Guide}}\\[0.5cm]
+    {\large Système d'aide à l'orientation pour les étudiants du cycle ingénieur}\\[2cm]
+
+    \begin{tabular}{rl}
+        \textbf{Réalisé par :} & EL KIHEL Riyad \\
+                               & EL MESSAOUDI Othmane \\
+                               & HALOUBI Ahmed \\[0.5cm]
+        \textbf{Année universitaire :} & 2025 -- 2026 \\
+    \end{tabular}
+
     \vfill
-    
-    \begin{center}
-        \begin{tcolorbox}[
-            colback=white,
-            colframe=primary,
-            width=0.8\textwidth,
-            arc=8pt,
-            boxrule=1pt
-        ]
-            \centering
-            \textbf{Réalisé par :}\\[0.3cm]
-            EL KIHEL Riyad \quad | \quad EL MESSAOUDI Othmane \quad | \quad HALOUBI Ahmed\\[0.5cm]
-            \textbf{Année Universitaire :} 2025-2026
-        \end{tcolorbox}
-    \end{center}
-    
-    \vspace{1cm}
+    {\small\today}
 \end{titlepage}
 
-% ============= Table of Contents =============
+% ---- Table des matières ----
+\renewcommand{\contentsname}{Table des matières}
 \tableofcontents
-\thispagestyle{empty}
 \newpage
 
-% ============= Chapter 1: Introduction =============
-\chapter{Introduction}
+% ============================================================
+\section{Problème à traiter}
+% ============================================================
 
-\section{Contexte du Projet}
+\subsection{Contexte}
 
-L'École Nationale des Sciences Appliquées (ENSA) de Safi propose six filières d'ingénierie distinctes aux étudiants ayant terminé leur cycle préparatoire. Le choix de la filière est une étape cruciale qui détermine le parcours professionnel futur de l'étudiant.
+À l'issue du cycle préparatoire de l'École Nationale des Sciences Appliquées (ENSA) de Safi,
+les étudiants doivent choisir l'une des six filières d'ingénierie proposées par l'établissement :
+GIIA (Génie Informatique et Intelligence Artificielle), GTR (Génie des Télécommunications et Réseaux),
+GINDUS (Génie Industriel), GMSI (Génie Mécatronique et Systèmes Intelligents), GPMA (Génie des Procédés
+et Matériaux Avancés) et GATE (Génie Aéronautique et Technologies de l'Espace).
 
-\begin{infobox}[Problématique]
-Comment aider les étudiants du cycle préparatoire à identifier la filière qui correspond le mieux à leurs intérêts, compétences et aspirations professionnelles ?
-\end{infobox}
+Cette décision est déterminante pour la trajectoire professionnelle de l'étudiant. Or, en l'absence
+d'un outil numérique centralisé, les informations sur chaque filière sont dispersées, incomplètes
+ou peu accessibles, ce qui contraint les étudiants à s'orienter sans données suffisantes.
 
-\section{Objectifs du Projet}
+\subsection{Problème identifié}
 
-Le projet \textbf{ENSAGuide} vise à :
+Le problème central est l'\textbf{asymétrie d'information} : l'étudiant ne dispose pas d'un moyen
+structuré pour comparer les filières, comprendre leur contenu pédagogique, leurs débouchés
+professionnels ou évaluer leur adéquation avec son profil personnel. Cette lacune peut mener
+à des orientations inadaptées, source d'insatisfaction académique et d'abandon.
 
-\begin{enumerate}[leftmargin=*]
-    \item Développer un \textbf{test d'orientation intelligent} basé sur un système de pondération.
-    \item Créer une \textbf{interface web moderne} et responsive.
-    \item Intégrer un \textbf{chatbot conversationnel} pour répondre aux questions fréquentes.
-    \item Fournir des \textbf{fiches détaillées} pour chaque filière (programme, débouchés, compétences).
-\end{enumerate}
+\subsection{Solution proposée}
 
-\section{Présentation des Filières}
-
-L'application couvre les six filières suivantes :
-
-\begin{table}[h!]
-\centering
-\renewcommand{\arraystretch}{1.4}
-\begin{tabular}{|>{\columncolor{primary!10}}c|l|l|}
-\hline
-\textbf{Code} & \textbf{Nom Complet} & \textbf{Domaine} \\
-\hline
-GIIA & Génie Informatique et Intelligence Artificielle & IT / Data Science \\
-GTR & Génie Réseaux \& Télécom & Réseaux / Cybersécurité \\
-GINDUS & Génie Industriel & Logistique / Supply Chain \\
-GMSI & Génie Mécatronique et Systèmes Intelligents & Robotique / Embarqué \\
-GPMA & Génie des Procédés \& Matériaux Avancés & Chimie / Environnement \\
-GATE & Génie Aéronautique & Aéronautique / Espace \\
-\hline
-\end{tabular}
-\caption{Les 6 filières d'ingénierie de l'ENSA Safi}
-\end{table}
-
-% ============= Chapter 2: Architecture Technique =============
-\chapter{Architecture Technique}
-
-\section{Stack Technologique}
-
-\begin{infobox}[Technologies Utilisées]
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Backend :} Flask (Python 3.x)
-    \item \textbf{Base de Données :} SQLite3
-    \item \textbf{Frontend :} HTML5, CSS3 (Vanille), JavaScript ES6+
-    \item \textbf{IA / NLP :} Scikit-learn (TF-IDF, Cosine Similarity)
-    \item \textbf{Polices :} Google Fonts (Outfit)
-    \item \textbf{Icônes :} Font Awesome 6
+Le projet \textbf{ENSA Guide} répond à ce besoin en construisant une plateforme web proposant :
+\begin{itemize}
+    \item Des fiches complètes pour chaque filière (description, programme sur 3 ans, débouchés) ;
+    \item Un \textbf{test d'orientation} basé sur un système de scoring dimensionnel adaptatif ;
+    \item Un \textbf{chatbot conversationnel} intégré, connecté au modèle Mistral AI ;
+    \item Un \textbf{espace personnel} permettant à l'étudiant authentifié de consulter son historique
+          de résultats ;
+    \item Une \textbf{interface d'administration} pour gérer les comptes et analyser les données.
 \end{itemize}
-\end{infobox}
 
-\section{Architecture MVC}
+% ============================================================
+\section{Méthodologie}
+% ============================================================
 
-L'application suit le pattern \textbf{Model-View-Controller} (MVC) :
+\subsection{Architecture générale}
 
-\begin{center}
-\begin{tikzpicture}[
-    node distance=2.5cm,
-    box/.style={rectangle, draw=primary, fill=primary!10, rounded corners, minimum height=1.2cm, minimum width=3cm, text centered, font=\bfseries},
-    arrow/.style={-{Stealth[length=3mm]}, thick, primary}
-]
-    % Nodes
-    \node[box] (user) {Utilisateur};
-    \node[box, right=of user] (view) {View\\(Templates Jinja2)};
-    \node[box, right=of view] (controller) {Controller\\(app.py)};
-    \node[box, below=of controller] (model) {Model\\(SQLite DB)};
-    \node[box, below=of view] (chatbot) {Chatbot\\(TF-IDF)};
-    
-    % Arrows
-    \draw[arrow] (user) -- (view);
-    \draw[arrow] (view) -- (controller);
-    \draw[arrow] (controller) -- (model);
-    \draw[arrow] (model) -- (controller);
-    \draw[arrow] (controller) -- (view);
-    \draw[arrow] (view) -- (user);
-    \draw[arrow, dashed, primarydark] (user) |- (chatbot);
-    \draw[arrow, dashed, primarydark] (chatbot) -| (user);
-    
-\end{tikzpicture}
-\end{center}
+Le projet est construit selon le patron \textbf{Modèle--Vue--Contrôleur (MVC)}, réparti en trois
+couches distinctes :
 
-\section{Structure des Fichiers}
+\begin{itemize}
+    \item \textbf{Modèle} : base de données relationnelle SQLite3 stockant les
+          spécialités, les questions, les utilisateurs et les résultats de test.
+    \item \textbf{Vue} : templates HTML rendus côté serveur via le moteur Jinja2,
+          accompagnés de feuilles de style CSS et de scripts JavaScript.
+    \item \textbf{Contrôleur} : serveur Flask (Python) organisé en Blueprints,
+          gérant le routage, l'authentification, le calcul des scores et les API REST.
+\end{itemize}
 
-\begin{codebox}[Arborescence du Projet]
-\begin{lstlisting}[language=bash]
+\subsection{Organisation du code}
+
+Le projet est structuré selon les répertoires suivants :
+
+\begin{lstlisting}[language=bash, caption={Arborescence du projet}]
 mini-projet/
-|-- app.py                   # Serveur Flask (Routes)
-|-- chatbot.py               # Logique du Chatbot (TF-IDF)
-|-- ensa_orientation.db      # Base de donnees SQLite
-|-- schema.sql               # Schema de creation de la DB
-|-- requirements.txt         # Dependances Python
-|-- static/
-|   `-- css/
-|       `-- style.css        # Styles CSS (~1000 lignes)
-`-- templates/
-    |-- base.html            # Template de base (header, footer, chatbot)
-    |-- index.html           # Page d'accueil (Hero, Cards)
-    |-- questionnaire.html   # Test d'orientation
-    `-- filiere_detail.html  # Fiche detaillee d'une filiere
+|-- backend/
+|   |-- app.py               # Point d'entree Flask
+|   |-- models/
+|   |   `-- database.py      # Connexion et initialisation SQLite
+|   |-- routes/
+|   |   |-- main_routes.py   # Routes principales (pages HTML)
+|   |   |-- api_routes.py    # API REST (test, chat, admin)
+|   |   `-- admin_routes.py  # Routes administration
+|   |-- services/
+|   |   `-- ai_service.py    # Integration Mistral AI
+|   `-- utils/
+|       |-- helpers.py       # Decorateurs et filtres
+|       `-- config.py        # DIMENSIONS, WEIGHTS, FILIERE_NAMES
+|-- database/
+|   |-- schema.sql           # Schema de creation des tables
+|   |-- data.sql             # Donnees initiales (specialites, questions)
+|   `-- ensa_orientation.db  # Fichier SQLite genere
+`-- frontend/
+    |-- html/                # Templates Jinja2
+    |-- css/                 # Feuilles de style CSS
+    `-- js/                  # Scripts JavaScript
 \end{lstlisting}
-\end{codebox}
 
-% ============= Chapter 3: Base de Données =============
-\chapter{Base de Données}
+\subsection{Flux de données}
 
-\section{Schéma Relationnel}
-
-La base de données SQLite contient deux tables principales :
-
-\begin{center}
-\begin{tikzpicture}[
-    table/.style={rectangle, draw=primarydark, fill=white, rounded corners=3pt, minimum width=6cm},
-    header/.style={rectangle, fill=primary, text=white, font=\bfseries, minimum width=6cm, minimum height=0.7cm},
-    field/.style={font=\ttfamily\small}
-]
-    % Table Filieres
-    \node[table] (filieres) at (0,0) {
-        \begin{tabular}{ll}
-            \texttt{id} & INTEGER (PK) \\
-            \texttt{code} & TEXT (UNIQUE) \\
-            \texttt{nom} & TEXT \\
-            \texttt{description} & TEXT \\
-            \texttt{debouches} & TEXT \\
-            \texttt{mots\_cles} & TEXT \\
-            \texttt{formation\_json} & TEXT (JSON) \\
-        \end{tabular}
-    };
-    \node[header, above=0pt of filieres.north, anchor=south] {filieres};
-    
-    % Table Questions
-    \node[table] (questions) at (8,0) {
-        \begin{tabular}{ll}
-            \texttt{id} & INTEGER (PK) \\
-            \texttt{texte} & TEXT \\
-            \texttt{categorie} & TEXT \\
-            \texttt{poids\_json} & TEXT (JSON) \\
-        \end{tabular}
-    };
-    \node[header, above=0pt of questions.north, anchor=south] {questions};
-    
-\end{tikzpicture}
-\end{center}
-
-\section{Système de Pondération}
-
-Chaque question du test est associée à un \textbf{vecteur de poids} (JSON) qui indique son influence sur chaque filière.
-
-\begin{infobox}[Exemple de Pondération]
-\textbf{Question :} \textit{"J'aime résoudre des problèmes algorithmiques complexes."}\\[0.3cm]
-\textbf{Poids :} \texttt{\{"GIIA": 5, "GMSI": 2, "GTR": 1\}}\\[0.3cm]
-\textbf{Interprétation :} Une réponse élevée (4-5) à cette question favorisera fortement la filière GIIA.
-\end{infobox}
-
-\subsection{Formule de Calcul des Scores}
-
-Pour chaque filière $f$, le score total est calculé comme suit :
-
-\[
-\text{Score}_f = \sum_{q \in Q} \text{Réponse}_q \times \text{Poids}_{q,f}
-\]
-
-Où :
-\begin{itemize}
-    \item $Q$ est l'ensemble des questions
-    \item $\text{Réponse}_q \in \{1, 2, 3, 4, 5\}$ est la réponse de l'utilisateur
-    \item $\text{Poids}_{q,f}$ est le poids de la question $q$ pour la filière $f$
-\end{itemize}
-
-% ============= Chapter 4: Module Chatbot =============
-\chapter{Module Chatbot}
-
-\section{Technologie : TF-IDF et Similarité Cosinus}
-
-Le chatbot utilise une approche basée sur la \textbf{recherche d'information} (Information Retrieval) pour trouver la réponse la plus pertinente dans sa base de connaissances.
-
-\subsection{Algorithme}
-
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Vectorisation TF-IDF :} Transformation des questions de la knowledge base en vecteurs numériques.
-    \item \textbf{Transformation de l'input :} La question de l'utilisateur est également vectorisée.
-    \item \textbf{Calcul de similarité :} Utilisation de la \textbf{similarité cosinus} entre l'input et chaque question.
-    \item \textbf{Sélection :} La réponse associée à la question ayant la plus haute similarité est retournée (si > seuil 0.3).
+Le cycle de vie d'une requête de l'utilisateur est le suivant :
+\begin{enumerate}
+    \item L'utilisateur envoie une requête HTTP depuis le navigateur.
+    \item Flask l'intercepte via le Blueprint correspondant, vérifie les droits
+          de session si nécessaire.
+    \item Le contrôleur exécute une requête SQL sur la base SQLite via \texttt{get\_db\_connection()}.
+    \item Les données sont injectées dans un template Jinja2 (rendu HTML côté serveur)
+          ou retournées au format JSON (API REST).
+    \item La réponse est transmise au navigateur, qui l'affiche ou la traite via JavaScript.
 \end{enumerate}
 
-\begin{codebox}[Extrait de chatbot.py]
-\begin{lstlisting}[language=Python]
-def get_response(self, user_input):
-    user_vec = self.vectorizer.transform([user_input])
-    similarities = cosine_similarity(user_vec, self.tfidf_matrix)
-    best_idx = np.argmax(similarities)
-    score = similarities[0][best_idx]
-    
-    if score > 0.3:
-        return self.answers[best_idx]
-    else:
-        return "Je ne suis pas sur de comprendre..."
+% ============================================================
+\section{Outils et technologies}
+% ============================================================
+
+\subsection{Backend : Python et Flask}
+
+Flask est utilisé comme micro-framework web. Son mécanisme de \textit{Blueprints} permet
+de découper logiquement le code en modules indépendants (\texttt{main\_routes}, \texttt{api\_routes},
+\texttt{admin\_routes}). La bibliothèque \textbf{NumPy} est employée pour les calculs vectoriels
+du test d'orientation (normalisation par z-scores, softmax). La sécurité des mots de passe est
+assurée par \texttt{werkzeug.security} avec hachage \textit{scrypt}.
+
+\subsection{Base de données : SQLite3}
+
+SQLite3 est retenu pour sa légèreté et son intégration native en Python, sans serveur externe
+à configurer. Le fichier \texttt{ensa\_orientation.db} est généré automatiquement au démarrage
+si absent, à partir du schéma (\texttt{schema.sql}) et des données initiales (\texttt{data.sql}).
+
+\subsection{Frontend : HTML5, CSS3 et JavaScript}
+
+L'interface est développée en HTML/CSS/JavaScript sans framework tiers. Le moteur de templates
+Jinja2 permet le rendu dynamique des pages côté serveur. L'API \texttt{Fetch} JavaScript est
+utilisée pour les interactions asynchrones (soumission du test, chatbot).
+
+\subsection{Intelligence artificielle : Mistral AI}
+
+Le chatbot est connecté à l'API Mistral AI via un service dédié (\texttt{ai\_service.py}).
+En cas d'indisponibilité de l'API, un message de repli est retourné à l'utilisateur.
+
+% ============================================================
+\section{Implémentation}
+% ============================================================
+
+\subsection{Schéma de la base de données}
+
+La base de données comporte quatre tables principales, définies dans \texttt{schema.sql} :
+
+\begin{lstlisting}[language=SQL, caption={Extrait du schéma SQL (schema.sql)}]
+CREATE TABLE specialties (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    code        TEXT NOT NULL UNIQUE,
+    name        TEXT NOT NULL,
+    description TEXT NOT NULL,
+    career_paths TEXT,
+    subjects    TEXT,
+    additional_info TEXT   -- JSON : programme annee par annee
+);
+
+CREATE TABLE questions (
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    texte    TEXT NOT NULL,
+    texte_en TEXT,
+    texte_ar TEXT,
+    dimensions TEXT NOT NULL  -- ex. 'D2,D3'
+);
+
+CREATE TABLE users (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    email          TEXT UNIQUE NOT NULL,
+    access_code    TEXT NOT NULL,   -- hache via scrypt
+    nom_complet    TEXT,
+    role           TEXT,
+    is_active      INTEGER DEFAULT 1,
+    last_result_json TEXT,
+    profile_type   TEXT,
+    date_test      DATETIME
+);
+
+CREATE TABLE results (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id      INTEGER,
+    date_test    DATETIME,
+    result_json  TEXT,
+    profile_type TEXT,
+    duration     INTEGER,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
 \end{lstlisting}
-\end{codebox}
 
-\section{Base de Connaissances}
+Le champ \texttt{additional\_info} de la table \texttt{specialties} contient un objet JSON
+décrivant le programme pédagogique complet de la filière sur trois ans (six semestres),
+avec la liste des modules par semestre.
 
-Le chatbot dispose d'une base de 12 paires question/réponse couvrant :
-\begin{itemize}
-    \item Salutations
-    \item Descriptions des 6 filières
-    \item Débouchés professionnels
-    \item Conseils d'orientation
-\end{itemize}
+\subsection{Initialisation de la base de données}
 
-% ============= Chapter 5: Interface Utilisateur =============
-\chapter{Interface Utilisateur}
+L'initialisation est déclenchée au démarrage du serveur via \texttt{init\_db()}.
+Si le fichier SQLite est absent, le schéma et les données sont chargés automatiquement :
 
-\section{Design System}
+\begin{lstlisting}[language=Python, caption={Initialisation de la base (database.py)}]
+import sqlite3
+import os
 
-L'interface suit un \textbf{Design System} cohérent basé sur le thème marron de l'ENSA Safi.
+DB_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    'database', 'ensa_orientation.db'
+)
 
-\subsection{Palette de Couleurs}
+def get_db_connection():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
-\begin{center}
-\begin{tikzpicture}
-    \foreach \color/\name/\hex [count=\i from 0] in {
-        primary/Primary/\#CA6F1E,
-        primarydark/Primary Dark/\#A04000,
-        textmain/Text Main/\#1E293B,
-        textlight/Text Light/\#64748B,
-        background/Background/\#F8FAFC
-    } {
-        \fill[\color] (\i*2.8, 0) rectangle ++(2.5, 1.5);
-        \node[below, font=\small\bfseries] at (\i*2.8+1.25, 0) {\name};
-        \node[below, font=\tiny\ttfamily, text=textlight] at (\i*2.8+1.25, -0.4) {\hex};
-    }
-\end{tikzpicture}
-\end{center}
+def init_db():
+    if not os.path.exists(DB_PATH):
+        conn = get_db_connection()
+        schema_path = os.path.join(..., 'database', 'schema.sql')
+        with open(schema_path, 'r', encoding='utf-8') as f:
+            conn.executescript(f.read())
+        data_path = os.path.join(..., 'database', 'data.sql')
+        if os.path.exists(data_path):
+            with open(data_path, 'r', encoding='utf-8') as f:
+                conn.executescript(f.read())
+        conn.close()
+\end{lstlisting}
 
-\subsection{Composants UI}
+\noindent\textbf{Remarque :} ce mécanisme crée un problème connu~: si la base de données existe déjà,
+les modifications apportées à \texttt{data.sql} ne sont \emph{pas} appliquées automatiquement.
+L'utilisateur doit supprimer manuellement le fichier \texttt{.db} pour forcer la réinitialisation.
 
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Navbar :} Glassmorphism avec backdrop-filter blur.
-    \item \textbf{Hero Section :} Gradient subtil, animations float, statistiques.
-    \item \textbf{Cards :} Bordures arrondies (24px), ombres portées, hover avec transformation Y.
-    \item \textbf{Boutons :} Gradient marron, effet shadow-hover.
-    \item \textbf{Chatbot Widget :} Fenêtre flottante en bas à droite.
-\end{itemize}
+\subsection{Rendu dynamique des fiches de spécialité}
 
-\section{Responsive Design}
+La route \texttt{/filiere/<code\_filiere>} récupère la spécialité correspondante en base et
+effectue un mappage vers les noms de champs attendus par le template Jinja2 :
 
-L'application utilise des \textbf{Media Queries CSS} pour s'adapter aux différentes tailles d'écran :
+\begin{lstlisting}[language=Python, caption={Route de rendu des fiches (main\_routes.py)}]
+@main_bp.route('/filiere/<code_filiere>')
+def filiere_detail(code_filiere):
+    conn = get_db_connection()
+    filiere = conn.execute(
+        'SELECT * FROM specialties WHERE code = ?',
+        (code_filiere,)
+    ).fetchone()
+    conn.close()
 
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|c|l|}
-\hline
-\textbf{Device} & \textbf{Breakpoint} & \textbf{Adaptations} \\
-\hline
-Desktop & > 1200px & Grille 3 colonnes pour les cartes \\
-Tablet & 768px - 1200px & Grille 2 colonnes, Hero empilé \\
-Mobile & < 768px & Layout colonne unique, menu hamburger \\
-\hline
-\end{tabular}
-\caption{Points de rupture responsive}
-\end{table}
+    if filiere:
+        mapped_filiere = {
+            'code':         filiere['code'],
+            'nom':          filiere['name'],
+            'description':  filiere['description'],
+            'debouches':    filiere['career_paths'],
+            'mots_cles':    filiere['subjects'],
+            'formation_json': filiere['additional_info']
+        }
+        return render_template('filiere_detail.html',
+                               filiere=mapped_filiere)
+    return "Filiere non trouvee", 404
+\end{lstlisting}
 
-% ============= Chapter 6: Fonctionnalités =============
-\chapter{Fonctionnalités Clés}
+\subsection{Calcul du score d'orientation}
 
-\section{Test d'Orientation Intelligent}
+Le test soumet les réponses en format JSON à la route \texttt{/api/submit-test}.
+L'algorithme de scoring se déroule en quatre étapes :
 
-\begin{enumerate}[leftmargin=*]
-    \item L'utilisateur répond à 6 questions sur une échelle de Likert (1-5).
-    \item Les réponses sont envoyées via \textbf{Fetch API} au backend.
-    \item Le serveur calcule les scores pondérés pour chaque filière.
-    \item Les \textbf{Top 3 filières} sont affichées avec leurs scores.
+\begin{enumerate}
+    \item \textbf{Z-normalisation des réponses} : chaque réponse brute est normalisée
+          par rapport à la moyenne et à l'écart-type des réponses de l'utilisateur,
+          afin de neutraliser les biais de tendance centrale.
+    \item \textbf{Calcul des scores dimensionnels} : les questions sont associées à
+          des dimensions (D1 à D8, représentant des aptitudes telles que la logique,
+          l'informatique, les réseaux, etc.). Le score de chaque dimension est la
+          moyenne des z-scores des questions qui lui correspondent.
+    \item \textbf{Pondération par filière} : chaque filière est définie par un vecteur
+          de poids sur les dimensions, configuré dans \texttt{config.py}. Le score brut
+          d'une filière est le produit scalaire de ce vecteur et des scores dimensionnels.
+    \item \textbf{Softmax} : les scores bruts sont convertis en probabilités de
+          compatibilité (0--100\%) via la fonction softmax, ce qui garantit que leur
+          somme est toujours égale à 100\%.
 \end{enumerate}
 
-\section{Fiches Filières Détaillées}
+La formule appliquée est :
+\begin{equation}
+    P(f) = \frac{e^{S(f)}}{\displaystyle\sum_{k} e^{S(k)}} \times 100
+    \quad \text{avec} \quad
+    S(f) = \sum_{d \in D} w_{f,d} \cdot \bar{z}_d
+\end{equation}
 
-Chaque filière dispose d'une page complète avec :
+où $w_{f,d}$ est le poids de la filière $f$ sur la dimension $d$ et $\bar{z}_d$ est le
+score z-normalisé moyen de la dimension $d$.
+
+\begin{lstlisting}[language=Python, caption={Calcul softmax des scores (api\_routes.py)}]
+# Ponderation par filiere
+filiere_scores = {}
+for f_code, weights in WEIGHTS.items():
+    score = sum(weights.get(d, 0) * dim_scores[d]
+                for d in DIMENSIONS)
+    filiere_scores[f_code] = score
+
+# Softmax -> probabilites de compatibilite
+exp_scores = {f: np.exp(s) for f, s in filiere_scores.items()}
+sum_exp = sum(exp_scores.values())
+probabilities = {
+    f: (exp_scores[f] / sum_exp) * 100
+    for f in exp_scores
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Interface utilisateur}
+% ============================================================
+
+\subsection{Structure de la navigation}
+
+L'application est composée des pages suivantes :
 \begin{itemize}
-    \item Description et objectifs
-    \item Débouchés professionnels (affichés en tags)
-    \item Mots-clés / compétences (affichés en hashtags)
-    \item Programme de formation sur 3 ans (timeline visuelle)
+    \item \textbf{Accueil (\texttt{/})} : section \textit{hero} avec statistiques, puis
+          grille des six filières (cartes cliquables).
+    \item \textbf{Fiche filière (\texttt{/filiere/<code>})} : description complète,
+          programme par année et semestre, débouchés professionnels et mots-clés.
+    \item \textbf{Test d'orientation (\texttt{/test-orientation})} : questionnaire
+          paginé, barre de progression, rendu des résultats.
+    \item \textbf{Tableau de bord (\texttt{/dashboard})} : historique des tests,
+          profil calculé sur l'ensemble des résultats passés.
+    \item \textbf{Administration (\texttt{/admin})} : gestion des étudiants, activation/
+          désactivation des comptes, visualisation des statistiques globales.
 \end{itemize}
 
-\section{Chatbot Intégré}
+\subsection{Expérience utilisateur (UX)}
 
-Le widget de chat permet aux utilisateurs de poser des questions directement depuis n'importe quelle page. Exemples de questions supportées :
+Les choix de design visent à réduire la friction d'usage :
 \begin{itemize}
-    \item "C'est quoi GIIA ?"
-    \item "Quels sont les débouchés de GTR ?"
-    \item "Comment choisir ma filière ?"
+    \item La page d'accueil présente immédiatement les six filières en grille visuelle,
+          sans nécessiter de navigation.
+    \item Le test d'orientation est présenté question par question avec une barre
+          de progression, afin de ne pas décourager l'utilisateur.
+    \item Les résultats sont affichés sous forme de pourcentages de compatibilité
+          classés par ordre décroissant, accompagnés d'un profil textuel
+          (Spécialiste, Hybride ou Équilibré).
+    \item Un widget de chatbot flottant est accessible sur toutes les pages,
+          permettant de poser des questions contextuelles sans quitter la page en cours.
 \end{itemize}
 
-% ============= Chapter 7: Conclusion =============
-\chapter{Conclusion et Perspectives}
+\subsection{Limitations et problèmes rencontrés}
 
-\section{Bilan}
+Plusieurs dysfonctionnements ont été identifiés lors des phases de test :
 
-Le projet \textbf{ENSAGuide} répond efficacement à la problématique d'orientation des étudiants en proposant :
 \begin{itemize}
-    \item Une interface \textbf{moderne et intuitive}.
-    \item Un test d'orientation \textbf{basé sur des critères objectifs}.
-    \item Un chatbot \textbf{intelligent} pour l'assistance instantanée.
-    \item Des fiches filières \textbf{complètes et structurées}.
+    \item \textbf{CSS non chargé sur certaines routes} : Flask est configuré avec
+          \texttt{static\_url\_path='/static'}, mais certains templates utilisent
+          des chemins relatifs pour les feuilles de style. Sur des routes imbriquées
+          (ex. \texttt{/filiere/GIIA}), le navigateur interprète ces chemins
+          différemment, provoquant l'échec du chargement du CSS et la disparition
+          totale de la mise en page.
+    \item \textbf{Synchronisation SQL non automatique} : Le mécanisme \texttt{init\_db()}
+          ne s'exécute que si le fichier \texttt{.db} est absent. Toute modification
+          dans \texttt{data.sql} reste donc invisible tant que la base n'est pas
+          supprimée manuellement et régénérée.
+    \item \textbf{Responsivité partielle} : La mise en page fonctionne correctement
+          sur bureau (grille à trois colonnes). Sur mobile, certaines pages de filière
+          présentent des débordements de texte et des éléments non réorganisés,
+          faute de règles \texttt{@media} suffisamment granulaires.
 \end{itemize}
 
-\section{Améliorations Futures}
+% ============================================================
+\section{Conclusion}
+% ============================================================
 
-\begin{infobox}[Pistes d'Amélioration]
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Machine Learning avancé :} Utiliser un modèle de classification supervisé entraîné sur des données réelles d'étudiants.
-    \item \textbf{Authentification :} Permettre aux étudiants de créer un compte pour sauvegarder leurs résultats.
-    \item \textbf{Chatbot LLM :} Intégrer un modèle de langage (GPT, LLaMA) pour des réponses plus naturelles.
-    \item \textbf{Tableau de bord admin :} Interface pour ajouter/modifier des filières et questions.
-    \item \textbf{Multilingue :} Support de l'arabe et de l'anglais.
+Le projet \textbf{ENSA Guide} constitue une réponse fonctionnelle et technique au problème
+d'orientation des étudiants en fin de cycle préparatoire à l'ENSA Safi. L'application
+couvre l'ensemble du besoin initial : consultation des filières, test d'orientation personnalisé,
+chatbot conversationnel et gestion des comptes.
+
+Le choix de la pile technologique (Python/Flask, SQLite, HTML/CSS vanilla) s'est révélé adapté
+à un projet de cette envergure~: légèreté du déploiement, absence de dépendances lourdes, et
+structure modulaire facilitant la maintenance.
+
+Les principales faiblesses identifiées --- synchronisation SQL, chargement CSS conditionnel,
+et responsivité partielle --- relèvent de problèmes d'intégration et de configuration, et non
+d'une déficience architecturale. Elles sont donc corrigeables sans refonte majeure du projet.
+
+% ============================================================
+\section{Perspectives et améliorations}
+% ============================================================
+
+\subsection{Corrections techniques prioritaires}
+
+\begin{enumerate}
+    \item \textbf{Chargement CSS robuste} : Remplacer tous les chemins relatifs
+          des feuilles de style par des appels à \texttt{url\_for('static', filename=...)},
+          garantissant une URL absolue indépendante de la route active.
+
+    \item \textbf{Synchronisation de la base de données} : Implémenter un script de
+          migration (\texttt{migrate.py}) exécuté séparément, permettant d'appliquer
+          des modifications SQL sans supprimer la base existante. Alternativement,
+          utiliser Flask-Migrate ou un système de versionnement des schémas.
+
+    \item \textbf{Responsivité complète} : Refactoriser les feuilles de style en
+          adoptant une approche \textit{mobile-first}, avec des règles \texttt{@media}
+          systématiques pour les grilles et les sections de contenu des fiches de filière.
 \end{enumerate}
-\end{infobox}
 
-\vfill
+\subsection{Évolutions fonctionnelles}
 
-\begin{center}
-\textcolor{primary}{\rule{0.5\textwidth}{1pt}}\\[0.5cm]
-{\large\textit{Fin du Rapport}}\\[0.3cm]
-{\small ENSA Safi - 2025/2026}
-\end{center}
+\begin{enumerate}
+    \item \textbf{Personnalisation du chatbot} : Enrichir le contexte transmis à
+          Mistral AI avec les données de la base (descriptions des filières, questions
+          fréquentes), afin d'obtenir des réponses plus précises et contextualisées.
+
+    \item \textbf{Tableau de bord administratif enrichi} : Ajouter des graphiques
+          de répartition des profils d'orientation pour aider l'administration à
+          anticiper les flux vers chaque département.
+
+    \item \textbf{Support multilingue} : Le système de questions dispose déjà de
+          champs \texttt{texte\_en} (anglais) et \texttt{texte\_ar} (arabe).
+          L'intégration d'un sélecteur de langue dans l'interface permettrait
+          d'étendre l'accessibilité de la plateforme.
+
+    \item \textbf{Déploiement en production} : Migrer de SQLite vers PostgreSQL
+          pour un déploiement multi-utilisateurs, et conteneuriser l'application
+          avec Docker pour simplifier les mises à jour.
+\end{enumerate}
 
 \end{document}

@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="filiere-page">
+    <section class="filiere-hero">
+        <div class="hero-bg-overlay"></div>
+        <div class="hero-content-wrapper">
+            <span class="filiere-badge">Formation d'Ingénieur</span>
+            <h1 class="filiere-title" id="fd-nom">Chargement...</h1>
+            <div class="filiere-meta">
+                <span class="meta-item"><i class="fas fa-code-branch"></i> Code: <span id="fd-code">{{ filiere.code }}</span></span>
+                <span class="meta-item"><i class="fas fa-university"></i> ENSA Safi</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="filiere-container" style="display:none;" id="fd-main-container">
+        <!-- Main Content Area -->
+        <div class="filiere-main">
+            <!-- Description Section -->
+
+            <div class="content-card">
+                <div class="card-header">
+                    <i class="fas fa-bullseye card-icon-header"></i>
+                    <h2>Objectifs & Description</h2>
+                </div>
+                <div class="card-body description-text" id="fd-description">
+                </div>
+            </div>
+
+            <!-- Débouchés Section -->
+            <div class="content-card" id="card-debouches" style="display: none;">
+                <div class="card-header">
+                    <i class="fas fa-briefcase card-icon-header"></i>
+                    <h2>Débouchés Professionnels</h2>
+                </div>
+                <div class="card-body">
+                    <div class="tags-container" id="fd-debouches">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mots Clés Section -->
+            <div class="content-card" id="card-mots-cles" style="display: none;">
+                <div class="card-header">
+                    <i class="fas fa-tags card-icon-header"></i>
+                    <h2>Compétences & Technologies</h2>
+                </div>
+                <div class="card-body">
+                    <div class="tags-container" id="fd-mots-cles">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why Choose Us Box -->
+            <div class="highlight-box">
+                <h3 id="fd-why-title"><i class="fas fa-star"></i> Pourquoi ?</h3>
+                <ul id="fd-why-list">
+                </ul>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="action-area">
+                <a href="{{ url_for('main_routes.index') }}" class="btn-outline">
+                    <i class="fas fa-arrow-left"></i> Retour aux filières
+                </a>
+                <a href="{{ url_for('main_routes.questionnaire') }}" class="btn-shine">
+                    <i class="fas fa-magic"></i> Est-ce fait pour moi ?
+                </a>
+            </div>
+        </div>
+
+        <!-- Sidebar: Formation Timeline -->
+        <div class="filiere-sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Programme de Formation</h2>
+            </div>
+            <div class="timeline-wrapper" id="fd-timeline">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    footer {
+        margin-top: 0 !important;
+    }
+
+    .filiere-page {
+        margin-bottom: 0 !important;
+        background-color: transparent !important;
+    }
+
+    .filiere-container {
+        margin-bottom: 0 !important;
+        padding-bottom: 4rem;
+    }
+
+    .timeline-end-marker {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 16px;
+        height: 16px;
+        background: white;
+        border: 4px solid var(--primary);
+        border-radius: 50%;
+        z-index: 10;
+        transform: translateY(50%);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const code = "{{ filiere.code }}";
+    
+    fetch(`/api/specialties/${code}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('fd-nom').innerText = "Filière non trouvée";
+                return;
+            }
+            
+            document.getElementById('fd-main-container').style.display = 'grid';
+            document.getElementById('fd-nom').innerText = data.name;
+            document.getElementById('fd-code').innerText = data.code;
+            document.getElementById('fd-description').innerHTML = data.description;
+            
+            if (data.career_paths) {
+                document.getElementById('card-debouches').style.display = 'block';
+                const items = data.career_paths.split(',');
+                const ctn = document.getElementById('fd-debouches');
+                items.forEach(item => {
+                    const sp = document.createElement('span');
+                    sp.className = 'tag-pill tag-primary';
+                    sp.innerHTML = `<i class="fas fa-check-circle"></i> ${item.trim()}`;
+                    ctn.appendChild(sp);
+                });
+            }
+            
+            if (data.subjects) {
+                document.getElementById('card-mots-cles').style.display = 'block';
+                const items = data.subjects.split(',');
+                const ctn = document.getElementById('fd-mots-cles');
+                items.forEach(item => {
+                    const sp = document.createElement('span');
+                    sp.className = 'tag-pill tag-secondary';
+                    sp.innerText = `#${item.trim()}`;
+                    ctn.appendChild(sp);
+                });
+            }
+            
+            document.getElementById('fd-why-title').innerHTML = `<i class="fas fa-star"></i> Pourquoi ${data.code} ?`;
+            const whyList = document.getElementById('fd-why-list');
+            let whyHtml = '';
+            if (data.code === 'GATE') {
+                whyHtml += `<li><i class="fas fa-rocket"></i> Secteur stratégique en forte croissance au Maroc.</li>
+                <li><i class="fas fa-cogs"></i> Formation pluridisciplinaire.</li>
+                <li><i class="fas fa-globe-americas"></i> Métiers techniques à l’échelle internationale.</li>`;
+            } else if (data.code === 'GMSI') {
+                whyHtml += `<li><i class="fas fa-microchip"></i> Combinaison mécanique–électronique–informatique.</li>
+                <li><i class="fas fa-industry"></i> Forte insertion dans plusieurs industries.</li>
+                <li><i class="fas fa-brain"></i> Formation orientée innovation et systèmes intelligents.</li>`;
+            } else if (data.code === 'GPMA') {
+                whyHtml += `<li><i class="fas fa-flask"></i> Maîtrise des procédés industriels et des matériaux.</li>
+                <li><i class="fas fa-bolt"></i> Forte employabilité dans l’industrie et l’énergie.</li>
+                <li><i class="fas fa-leaf"></i> Formation axée performance, qualité et durabilité.</li>`;
+            } else if (data.code === 'GTR') {
+                whyHtml += `<li><i class="fas fa-network-wired"></i> Forte demande en réseaux, télécoms et cybersécurité.</li>
+                <li><i class="fas fa-cloud"></i> Compétences en télécommunication, IoT et cloud.</li>
+                <li><i class="fas fa-laptop-code"></i> Large éventail de carrières numériques.</li>`;
+            } else if (data.code === 'GINDUS') {
+                whyHtml += `<li><i class="fas fa-sitemap"></i> Formation polyvalente technique et managériale.</li>
+                <li><i class="fas fa-tasks"></i> Rôle clé dans l’organisation des entreprises.</li>
+                <li><i class="fas fa-briefcase"></i> Intégration facile dans différents secteurs.</li>`;
+            } else if (data.code === 'GIIA') {
+                whyHtml += `<li><i class="fas fa-code"></i> Forte demande en développement et technologies.</li>
+                <li><i class="fas fa-project-diagram"></i> Spécialisation en data, IA et systèmes intelligents.</li>
+                <li><i class="fas fa-lightbulb"></i> Métiers d’avenir dans le digital et l’innovation.</li>`;
+            } else {
+                whyHtml += `<li><i class="fas fa-check-circle"></i> Formation d'excellence</li>
+                <li><i class="fas fa-briefcase"></i> Insertion professionnelle élevée</li>
+                <li><i class="fas fa-laptop-code"></i> Pédagogie par projet</li>`;
+            }
+            whyList.innerHTML = whyHtml;
+            
+            // Timeline
+            const tl = document.getElementById('fd-timeline');
+            let tlHtml = '';
+            
+            if (data.additional_info && data.additional_info.length > 0) {
+                data.additional_info.forEach(annee => {
+                    tlHtml += `<div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h3 class="year-title">${annee.year}</h3>
+                            <div class="semesters-grid">`;
+                    if(annee.semesters) {
+                        annee.semesters.forEach(sem => {
+                            tlHtml += `<div class="semester-box"><h4 class="semester-name">${sem.name}</h4>`;
+                            let hasGi = false;
+                            let hasGidia = false;
+                            
+                            if (sem.modules) {
+                                sem.modules.forEach(mod => {
+                                    if(typeof mod === 'object') {
+                                        if(mod.type === 'gi') hasGi = true;
+                                        if(mod.type === 'gidia') hasGidia = true;
+                                    }
+                                });
+                                
+                                if(hasGi || hasGidia) {
+                                    tlHtml += `<div class="specialization-split">
+                                        <div class="spec-column col-gi">
+                                            <div class="spec-header">${data.code === 'GPMA' ? 'Génie des Matériaux Avancés' : 'Génie Informatique'}</div>
+                                            <ul class="modules-list">`;
+                                    sem.modules.forEach(mod => {
+                                        if(typeof mod === 'object' && mod.type === 'gi') tlHtml += `<li class="module-item mod-gi">${mod.name}</li>`;
+                                    });
+                                    tlHtml += `</ul></div>
+                                        <div class="spec-column col-gidia">
+                                            <div class="spec-header">${data.code === 'GPMA' ? 'Génie des Procédés industriels, digitalisation' : 'INGÉNIERIE DES DONNÉES ET INTELLIGENCE ARTIFICIELLE'}</div>
+                                            <ul class="modules-list">`;
+                                    sem.modules.forEach(mod => {
+                                        if(typeof mod === 'object' && mod.type === 'gidia') tlHtml += `<li class="module-item mod-gidia">${mod.name}</li>`;
+                                    });
+                                    tlHtml += `</ul></div></div>
+                                    <div class="common-section">
+                                        <div class="common-label">Tronc Commun / Modules Transversaux</div>
+                                        <ul class="modules-list common-grid">`;
+                                    sem.modules.forEach(mod => {
+                                        if(typeof mod === 'object' && mod.type === 'common') {
+                                            tlHtml += `<li class="module-item mod-common">${mod.name}</li>`;
+                                        } else if (typeof mod === 'string') {
+                                            tlHtml += `<li>${mod}</li>`;
+                                        }
+                                    });
+                                    tlHtml += `</ul></div>`;
+                                } else {
+                                    tlHtml += `<ul class="modules-list">`;
+                                    sem.modules.forEach(mod => {
+                                        if(typeof mod === 'object') {
+                                            tlHtml += `<li class="module-item mod-common">${mod.name}</li>`;
+                                        } else {
+                                            tlHtml += `<li>${mod}</li>`;
+                                        }
+                                    });
+                                    tlHtml += `</ul>`;
+                                }
+                            }
+                            tlHtml += `</div>`;
+                        });
+                    }
+                    tlHtml += `</div></div></div>`;
+                });
+            } else {
+                tlHtml = `<div class="empty-state">
+                    <i class="fas fa-clock"></i>
+                    <p>Le programme détaillé sera bientôt disponible.</p>
+                </div>`;
+            }
+            
+            tl.innerHTML = tlHtml + '<div class="timeline-end-marker"></div>';
+        });
+});
+</script>
+{% endblock %}
