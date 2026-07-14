@@ -8,22 +8,55 @@
 % ---- Encodage et langue ----
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{lmodern}
 \usepackage[french]{babel}
-
-% ---- Mise en page ----
-\usepackage{geometry}
-\geometry{margin=3.25cm}
+\usepackage{csquotes}
+\usepackage{placeins}
 
 % ---- Mathématiques ----
 \usepackage{amsmath, amssymb}
+%--------------------- Variables rapport -----------------
+\newcommand{\TitreRapport}{}
+\newcommand{\SujetRapport}{}
+\newcommand{\ModuleRapport}{}
+\newcommand{\Encadrant}{}
+\newcommand{\Etudiant}{}
+\newcommand{\Jury}{}
+\newcommand{\SousTitreRapport}{}
+
+% ---- Formatage des titres (Chapitres) ----
+\usepackage{titlesec}
+\titleformat{\section}[block]
+  {\normalfont\LARGE\bfseries}
+  {Chapitre \thesection~:}
+  {0.4em}
+  {}
+
+\usepackage{titletoc}
+\titlecontents{section}[0em]
+  {\vspace{0.3cm}\bfseries}
+  {Chapitre \thecontentslabel~: }
+  {}
+  {\titlerule*[0.7pc]{.}\contentspage}
 
 % ---- Graphiques et tableaux ----
 \usepackage{graphicx}
+\usepackage{float}
 \usepackage{array}
 \usepackage{booktabs}
+\usepackage[a4paper, margin=3.25cm]{geometry}
+\emergencystretch=3em
+\hbadness=10000
+\hfuzz=32pt
+\vfuzz=17pt
 
 % ---- Listes ----
 \usepackage{enumitem}
+
+% ---- TikZ et diagrammes ----
+\usepackage{tikz}
+\usepackage{pgfgantt}
+\usetikzlibrary{arrows.meta, positioning}
 
 % ---- Hyperliens ----
 \usepackage{hyperref}
@@ -33,10 +66,29 @@
     urlcolor=black,
     citecolor=black
 }
-
+\usepackage{xurl}
 % ---- Code source ----
 \usepackage{listings}
 \usepackage{xcolor}
+\lstdefinestyle{filetree}{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{brownlight},
+    frame=single,
+    framerule=1pt,
+    rulecolor=\color{brownmain},
+    xleftmargin=12pt,
+    xrightmargin=6pt,
+    framexleftmargin=8pt,
+    framexrightmargin=4pt,
+    framextopmargin=6pt,
+    framexbottommargin=6pt,
+    numbers=none,
+    breaklines=false,
+    keepspaces=true,
+    showstringspaces=false,
+    commentstyle=\color{brownmid}\itshape,
+    morecomment=[l]{\#},
+}
 
 \definecolor{codegray}{gray}{0.95}
 \definecolor{codeblue}{RGB}{0,0,200}
@@ -69,7 +121,36 @@
     commentstyle=\color{codegreen},
     stringstyle=\color{codered},
     morestring=[b]',
-    morestring=[b]"
+    morestring=[b]" % chktex 18
+}
+% ---- Couleurs du thème brun ----
+\definecolor{brownmain}{RGB}{107,58,42}
+\definecolor{brownlight}{HTML}{FDF6F0}
+\definecolor{brownmid}{HTML}{A0785A}
+
+% ---- Graphiques et tableaux ----
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{caption}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% ---- Boîtes stylisées ----
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+
+\newtcolorbox{infobox}{
+  enhanced,
+  colback=brownlight,
+  colframe=brownmain,
+  leftrule=4pt,
+  toprule=0.5pt,
+  bottomrule=0.5pt,
+  rightrule=0.5pt,
+  arc=2pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
 }
 
 % ---- Graphiques pgf ----
@@ -80,266 +161,772 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small\textit{ENSA Guide --- Rapport de Projet}}
-\fancyhead[R]{\small\textit{\thepage}}
-\renewcommand{\headrulewidth}{0.4pt}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
 
-% ============================================================
-\begin{document}
-% ============================================================
-
-% ---- Page de titre ----
+%--------------------- Page de garde --------------------
+\newcommand{\fairepagedegarde}{
 \begin{titlepage}
     \centering
-    \vspace*{3cm}
+    % En-tête avec les deux logos
+    \begin{minipage}{0.45\textwidth}
+        \begin{flushleft}
+            \includegraphics[height=4.5cm]{images/ENSA.png}
+        \end{flushleft}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \begin{flushright}
+            \includegraphics[height=4.5cm]{images/Caadi.png}
+        \end{flushright}
+    \end{minipage}
 
-    {\Large\textbf{École Nationale des Sciences Appliquées de Safi}}\\[0.4cm]
-    {\large Université Cadi Ayyad}\\[2cm]
+    \vspace{0.4cm}
+    {\scshape\Large Université Cadi Ayyad \\[0.2cm] École Nationale des Sciences Appliquées de Safi \\[0.2cm] Département Informatique, Réseaux et Télécommunications \par}
 
-    \rule{\textwidth}{0.8pt}\\[0.5cm]
-    {\LARGE\textbf{Rapport de Projet}}\\[0.3cm]
-    {\large\textit{Plateforme Web d'Orientation Académique}}\\[0.3cm]
-    \rule{\textwidth}{0.8pt}\\[1.5cm]
+    \vspace{0.9cm}
+    {\scshape\Large \SujetRapport \par}
 
-    {\Huge\textbf{ENSA Guide}}\\[0.5cm]
-    {\large Système d'aide à l'orientation pour les étudiants du cycle ingénieur}\\[2cm]
+    \vspace{0.9cm}
+    {\rule{0.9\linewidth}{1.1pt}\par}
+    \vspace{0.45cm}
+    {\Huge\bfseries \TitreRapport \par}
+    \vspace{0.35cm}
+    {\fontsize{14.4}{18}\selectfont\itshape \SousTitreRapport\/ \par}
+    \vspace{0.45cm}
+    {\rule{0.9\linewidth}{1.1pt}\par}
 
-    \begin{tabular}{rl}
-        \textbf{Réalisé par :} & EL KIHEL Riyad \\
-                               & EL MESSAOUDI Othmane \\
-                               & HALOUBI Ahmed \\[0.5cm]
-        \textbf{Année universitaire :} & 2025 -- 2026 \\
+    \vspace{0.8cm}
+    \begin{minipage}[t]{0.4\textwidth}
+        \begin{flushleft} \Large
+            \textit{\textbf{Réalisé par:}}\par
+            \vspace{0.3cm}
+            \large \Etudiant
+        \end{flushleft}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.5\textwidth}
+        \begin{flushright} \Large
+            \textit{\textbf{Encadré à l'ENSA par:}}\par
+            \vspace{0.3cm}
+            \large \Encadrant
+        \end{flushright}
+    \end{minipage}
+
+    \vspace{0.8cm}
+    {\large Soutenu le \textbf{20/05/2026} devant le jury composé de: \par}
+    \vspace{0.4cm}
+    \begin{center}
+    \large
+    \begin{tabular}{ll}
+        \Jury
     \end{tabular}
+    \end{center}
 
     \vfill
-    {\small\today}
+    {\Large Année Universitaire: \textbf{2025--2026} \par}
 \end{titlepage}
+}
 
-% ---- Table des matières ----
+%--------------------- Début document ------------------
+\title{Rapport de Projet Académique}
+\date{}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+
+% Different margins for cover page
+\newgeometry{
+    top=2cm,
+    bottom=3.5cm,
+    left=2.5cm,
+    right=2.5cm
+}
+%----------- Informations du rapport ---------
+\renewcommand{\TitreRapport}{Plateforme Web\\d'Orientation Académique}
+\renewcommand{\SousTitreRapport}{EnsaGuide -- Système intelligent d'aide à l'orientation}
+\renewcommand{\SujetRapport}{Rapport du mini projet}
+\renewcommand{\Encadrant}{M. OUAFIK Youssef}
+\renewcommand{\Etudiant}{EL KIHEL Riyad \\ EL MESSAOUDI Othmane \\ HALOUBI Ahmed}
+\renewcommand{\Jury}{\textbf{Mme. MESTOURI Hind} & Professeur à l'ENSA de Safi \\ \textbf{M. OUAFIK Youssef} & Professeur à l'ENSA de Safi \\}
+
+%----------- Page de garde -----------------
+\fairepagedegarde
+
+% Return to normal margins
+\restoregeometry
+
+
+\pagenumbering{roman}
+
+% =======================
+% Dédicaces
+% =======================
+\newpage
+\addcontentsline{toc}{section}{Dédicaces}
+\section*{\Huge{Dédicaces}}
+\vspace{2cm}
+\begin{center}
+\textit{
+À nos chers parents, pour leurs sacrifices, leur soutien inconditionnel et leurs prières continues.\\[0.5cm]
+À nos familles, nos amis et à tous ceux qui ont cru en nous et nous ont encouragés tout au long de notre parcours d'études.\\[0.5cm]
+À nos professeurs pour leur dévouement.\\[0.5cm]
+À tous nos camarades de l'École Nationale des Sciences Appliquées de Safi.\\[0.5cm]
+Nous dédions ce travail.
+}
+\end{center}
+
+% =======================
+% Remerciements
+% =======================
+\newpage
+\addcontentsline{toc}{section}{Remerciements}
+\section*{\Huge{Remerciements}}
+\vspace{1cm}
+{\large \itshape
+Nous tenons tout d'abord à exprimer notre sincère gratitude au Professeur
+{\normalsize\textbf{OUAFIK Youssef}} pour son encadrement, ses précieux conseils et sa
+disponibilité tout au long de ce projet. Son expertise et son encouragement
+ont été essentiels pour mener à bien notre travail.
+
+\vspace{0.5cm}
+
+Nous souhaitons également adresser nos chaleureux remerciements aux membres
+du jury, {\normalsize\textbf{Mme. MESTOURI Hind}} et {\normalsize\textbf{M. OUAFIK Youssef}}, pour le
+temps qu'ils ont consacré à l'évaluation de ce travail et pour leurs remarques
+constructives.
+
+\vspace{0.5cm}
+
+Nous souhaitons aussi adresser nos remerciements au personnel enseignant et
+administratif de l'École Nationale des Sciences Appliquées de Safi, dont
+l'enseignement de qualité nous a permis d'acquérir les connaissances nécessaires
+pour réaliser ce projet avec succès.
+
+\vspace{0.5cm}
+
+Nos remerciements vont également à l'endroit de nos amis et collègues, dont
+le soutien moral et intellectuel a été inestimable. Leurs discussions stimulantes
+et leurs encouragements ont contribué à enrichir notre réflexion et à surmonter
+les obstacles rencontrés.
+
+\vspace{0.5cm}
+
+Enfin, nous, {\normalsize\textbf{EL KIHEL Riyad}}, {\normalsize\textbf{EL MESSAOUDI Othmane}} et
+{\normalsize\textbf{HALOUBI Ahmed}}, exprimons notre profonde gratitude à nos parents et
+à nos proches pour leur soutien indéfectible, leurs conseils avisés et leur
+compréhension tout au long de cette période.
+
+\vspace{0.5cm}
+
+Ce projet n'aurait pas été possible sans l'appui et la collaboration de toutes
+ces personnes, et nous leur en sommes infiniment reconnaissants.
+}
+
+% =======================
+% Résumé
+% =======================
+\newpage
+\addcontentsline{toc}{section}{Résumé}
+\section*{\Huge{Résumé}}
+\vspace{1cm}
+{\large
+À l'issue du cycle préparatoire de l'École Nationale des Sciences Appliquées de Safi, les étudiants sont confrontés au choix crucial de leur filière d'ingénierie parmi les six options proposées. Ce projet a pour \textbf{objectif} de concevoir et de développer \enquote{ENSA Guide}, une plateforme web interactive d'aide à l'orientation. La \textbf{méthodologie} adoptée repose sur le développement d'une architecture MVC en Python (Flask) couplée à une base de données SQLite. L'outil intègre un questionnaire psychométrique dimensionnel avec calcul de compatibilité (Z-score et Softmax) ainsi qu'un assistant IA conversationnel via l'API Mistral. Les principales \textbf{conclusions} démontrent que la plateforme permet une évaluation précise, rapide et objective des profils étudiants, réduisant ainsi l'incertitude et optimisant leur processus de choix de filière.
+
+\vspace{0.5cm}
+\textbf{Mots-clés :} Orientation académique, ENSA Safi, Développement Web, Algorithme de recommandation, Flask, Intelligence Artificielle.
+}
+
+% =======================
+% Abstract
+% =======================
+\newpage
+\addcontentsline{toc}{section}{Abstract}
+\section*{\Huge{Abstract}}
+\vspace{1cm}
+{\large
+At the end of the preparatory cycle at the National School of Applied Sciences (ENSA) of Safi, students face the crucial choice of selecting their engineering specialty from six available options. The \textbf{objective} of this project is to design and develop \enquote{ENSA Guide,} an interactive web platform for academic orientation. The adopted \textbf{methodology} is based on the development of an MVC architecture in Python (Flask) coupled with an SQLite database. The tool integrates a dimensional psychometric questionnaire with a compatibility calculation algorithm (Z-score and Softmax) as well as a conversational AI assistant via the Mistral API. The main \textbf{conclusions} demonstrate that the platform allows for accurate, fast, and objective evaluations of student profiles, thereby reducing uncertainty and optimizing their specialty selection process.
+
+\vspace{0.5cm}
+\textbf{Keywords :} Academic orientation, ENSA Safi, Web Development, Recommendation Algorithm, Flask, Artificial Intelligence.
+}
+
+% =======================
+% Liste des abréviations
+% =======================
+\newpage
+\addcontentsline{toc}{section}{Liste des abréviations}
+\section*{\Huge{Liste des abréviations}}
+\vspace{1cm}
+\begin{itemize}[label=\textbullet, font=\large\bfseries, itemsep=0.5cm]
+    \item \textbf{ENSA} : École Nationale des Sciences Appliquées
+    \item \textbf{GIIA} : Génie Informatique et Intelligence Artificielle
+    \item \textbf{GTR} : Génie des Télécommunications et Réseaux
+    \item \textbf{GINDUS} : Génie Industriel
+    \item \textbf{GMSI} : Génie Mécatronique et Systèmes Intelligents
+    \item \textbf{GPMA} : Génie des Procédés et Matériaux Avancés
+    \item \textbf{GATE} : Génie Aéronautique et Technologies de l'Espace
+    \item \textbf{MVC} : Modèle-Vue-Contrôleur
+    \item \textbf{IA} : Intelligence Artificielle
+    \item \textbf{API} : Application Programming Interface
+    \item \textbf{JSON} : JavaScript Object Notation
+\end{itemize}
+
+% =======================
+% Listes et Table des matières
+% =======================
+\newpage
+\addcontentsline{toc}{section}{Liste des figures}
+\renewcommand{\listfigurename}{Liste des figures}
+\listoffigures
+
+\newpage
+\addcontentsline{toc}{section}{Liste des tableaux}
+\renewcommand{\listtablename}{Liste des tableaux}
+\listoftables
+
+\newpage
+\addcontentsline{toc}{section}{Table des matières}
 \renewcommand{\contentsname}{Table des matières}
 \tableofcontents
 \newpage
-
+\clearpage
+\hypersetup{pageanchor=true}
+\pagenumbering{arabic}
 % ============================================================
-\section{Problème à traiter}
+\clearpage
+\section{Introduction générale}
 % ============================================================
 
-\subsection{Contexte}
+À l'issue du cycle préparatoire de l'École Nationale des Sciences Appliquées (ENSA) de Safi, les étudiants font face à une décision académique décisive : le choix de leur spécialité d'ingénierie parmi les six filières proposées par l'établissement (GIIA, GTR, GINDUS, GMSI, GPMA et GATE). Cette étape conditionne de manière irréversible leur trajectoire professionnelle et exige une réflexion approfondie.
 
-À l'issue du cycle préparatoire de l'École Nationale des Sciences Appliquées (ENSA) de Safi,
-les étudiants doivent choisir l'une des six filières d'ingénierie proposées par l'établissement :
-GIIA (Génie Informatique et Intelligence Artificielle), GTR (Génie des Télécommunications et Réseaux),
-GINDUS (Génie Industriel), GMSI (Génie Mécatronique et Systèmes Intelligents), GPMA (Génie des Procédés
-et Matériaux Avancés) et GATE (Génie Aéronautique et Technologies de l'Espace).
+Cependant, l'absence d'une plateforme d'information centralisée et structurée complexifie grandement cette démarche. Les informations relatives aux maquettes pédagogiques, aux compétences visées et aux débouchés sont souvent fragmentées, ce qui engendre une \textbf{asymétrie d'information structurelle}. L'étudiant se retrouve démuni face à la difficulté d'évaluer l'adéquation entre ces formations et son profil cognitif.
 
-Cette décision est déterminante pour la trajectoire professionnelle de l'étudiant. Or, en l'absence
-d'un outil numérique centralisé, les informations sur chaque filière sont dispersées, incomplètes
-ou peu accessibles, ce qui contraint les étudiants à s'orienter sans données suffisantes.
+Pour pallier cette carence, le projet \textbf{ENSA Guide} a été initié avec pour ambition de concevoir une plateforme web interactive d'aide à l'orientation. L'objectif fondamental est de fournir un accompagnement technologique sur mesure via un test psychométrique dimensionnel rigoureux et un assistant virtuel conversationnel, garantissant ainsi une prise de décision éclairée, objective et personnalisée.
 
-\subsection{Problème identifié}
-
-Le problème central est l'\textbf{asymétrie d'information} : l'étudiant ne dispose pas d'un moyen
-structuré pour comparer les filières, comprendre leur contenu pédagogique, leurs débouchés
-professionnels ou évaluer leur adéquation avec son profil personnel. Cette lacune peut mener
-à des orientations inadaptées, source d'insatisfaction académique et d'abandon.
-
-\subsection{Solution proposée}
-
-Le projet \textbf{ENSA Guide} répond à ce besoin en construisant une plateforme web proposant :
+Afin d'exposer de manière méthodique l'architecture et la réalisation de cette plateforme, ce rapport s'articule autour des axes suivants :
 \begin{itemize}
-    \item Des fiches complètes pour chaque filière (description, programme sur 3 ans, débouchés) ;
-    \item Un \textbf{test d'orientation} basé sur un système de scoring dimensionnel adaptatif ;
-    \item Un \textbf{chatbot conversationnel} intégré, connecté au modèle Mistral AI ;
-    \item Un \textbf{espace personnel} permettant à l'étudiant authentifié de consulter son historique
-          de résultats ;
-    \item Une \textbf{interface d'administration} pour gérer les comptes et analyser les données.
+    \item \textbf{Chapitre 2 : Méthodologie et Architecture} -- Présente l'approche incrémentale du projet, l'algorithmique du scoring de compatibilité et l'organisation du modèle MVC.
+    \item \textbf{Chapitre 3 : Outils et technologies} -- Expose la pile technologique déployée (backend, base de données, frontend) et l'intégration de l'intelligence artificielle.
+    \item \textbf{Chapitre 4 : Implémentation} -- Détaille la conception du schéma relationnel, l'authentification et l'ingénierie du module d'assistance Mistral AI.
+    \item \textbf{Chapitre 5 : Interface} -- Illustre le design, l'expérience de navigation de l'étudiant et l'ergonomie du tableau de bord d'administration.
+\end{itemize}
+% ============================================================
+\clearpage
+\section{Méthodologie et Architecture}
+% ============================================================
+\subsection{Approche de développement}
+
+Le projet a suivi une approche de développement incrémentale : les fonctionnalités ont été construites et validées module par module, dans l’ordre suivant :
+\begin{enumerate}
+    \item Conception du schéma de base de données et des tables nécessaires.
+    \item Développement de l’authentification et de la gestion des sessions.
+    \item Implémentation du questionnaire et de l’algorithme de calcul de compatibilité de filière (algorithme de scoring).
+    \item Création du tableau de bord étudiant et du panel administrateur.
+    \item Intégration du module d’intelligence artificielle (chatbot Mistral).
+    \item Finalisation des interfaces graphiques et tests fonctionnels.
+\end{enumerate}
+
+Le diagramme de Gantt présenté dans la figure~\ref{fig:gantt} décrit le planning du déroulement du projet dans sa globalité, réparti sur les différentes semaines de travail.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{ganttchart}[
+    x unit=0.15cm,
+    y unit title=0.7cm,
+    y unit chart=0.8cm,
+    vgrid={*4{dotted}, *1{dashed}},
+    hgrid,
+    time slot format=isodate,
+    time slot unit=day,
+    title/.append style={fill=brownmain!20},
+    title label font=\bfseries\footnotesize,
+    bar/.append style={fill=brownlight, draw=brownmain},
+    bar label font=\footnotesize,
+    milestone/.append style={fill=brownmain, draw=brownmain}
+]{2026-02-01}{2026-05-20}
+\gantttitlecalendar{year, month} \\
+\ganttbar{Analyse \& conception}{2026-02-01}{2026-02-28} \\
+\ganttbar{Conception BD \& architecture}{2026-02-01}{2026-02-28} \\
+\ganttbar{Développement backend}{2026-03-01}{2026-03-31} \\
+\ganttbar{Développement frontend}{2026-03-01}{2026-03-31} \\
+\ganttbar{Algorithme d'orientation}{2026-03-01}{2026-03-15} \\
+\ganttbar{Intégration IA}{2026-04-01}{2026-04-30} \\
+\ganttbar{Tests \& validation}{2026-04-01}{2026-04-30} \\
+\ganttbar{Documentation}{2026-05-01}{2026-05-20} \\
+\ganttmilestone{Soutenance}{2026-05-20}
+\end{ganttchart}
+}
+\caption{Diagramme de Gantt illustrant le planning du projet}
+\label{fig:gantt}
+\end{figure}
+
+\subsection{Approche Algorithmique}
+
+L'algorithme de calcul de compatibilité de filière ne se contente pas d'additionner des points. Il repose sur une méthodologie en quatre étapes successives :
+
+\begin{enumerate}
+
+    \item \textbf{Inversion d'échelle :}
+
+    Le questionnaire comporte des affirmations formulées dans les deux sens : certaines sont positives (par exemple : \textit{\og J'aime résoudre des problèmes informatiques\fg{}}), tandis que d'autres sont négatives (par exemple : \textit{\og J'évite de travailler sur des ordinateurs\fg{}}).
+
+    Afin de garantir une interprétation homogène des réponses, les items négativement formulés sont inversés. Cette opération permet de faire en sorte qu'un score élevé traduise systématiquement une forte compatibilité avec la dimension évaluée, indépendamment de la formulation de la question.
+
+    Étant donné que l'échelle de réponse utilisée est comprise entre 1 et 7, l'inversion est réalisée selon la formule :
+    \[
+        r' = 8 - r
+    \]
+
+    où :
+    \begin{itemize}
+        \item $r$ représente la réponse brute de l'étudiant ;
+        \item $r'$ représente la réponse inversée.
+    \end{itemize}
+
+    Ainsi :
+    \begin{itemize}
+        \item une réponse de \textbf{7} devient \textbf{1} ;
+        \item une réponse de \textbf{6} devient \textbf{2} ;
+        \item une réponse de \textbf{4} reste inchangée.
+    \end{itemize}
+
+    Cette transformation garantit que toutes les réponses sont orientées dans le même sens avant l'étape de normalisation statistique.
+
+    \item \textbf{Normalisation par Z-Score :}
+
+    Deux étudiants peuvent avoir des habitudes de notation très différentes : l'un répond systématiquement entre 4 et 5 (étudiant \textit{\og généreux\fg{}}), tandis qu'un autre répond entre 1 et 2 (étudiant \textit{\og sévère\fg{}}). Sans correction, le premier obtiendrait des scores plus élevés, non pas parce qu'il est plus compatible, mais parce qu'il note plus fort. Le Z-Score neutralise ce biais en ramenant les réponses de chaque étudiant à une échelle commune selon la formule :
+    \[
+        z = \frac{r - \bar{r}}{\sigma}
+    \]
+
+    où :
+    \begin{itemize}
+        \item $r$ : la réponse brute de l'étudiant à une question ;
+        \item $\bar{r}$ : la moyenne de toutes ses réponses ;
+        \item $\sigma$ : l'écart-type de ses réponses ;
+        \item $z$ : le score normalisé final.
+    \end{itemize}
+
+    Ainsi, ce qui compte n'est plus la note brute de la réponse, mais \textbf{l'écart par rapport au comportement habituel de l'étudiant}.
+
+    \item \textbf{Agrégation dimensionnelle :}
+
+    Les questions du questionnaire sont regroupées en 8 dimensions comportementales, chacune mesurant une aptitude spécifique liée aux filières de l'établissement. Le tableau~\ref{tab:dimensions} présente la description détaillée de ces 8 dimensions.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cp{11cm}}
+\toprule
+\rowcolor{brownmain!20}
+\textbf{Dimension} & \textbf{Aptitude mesurée} \\
+\midrule
+\textbf{D1} & Capacité à raisonner de manière logique et à résoudre 
+des problèmes mathématiques complexes. \\
+\textbf{D2} & Affinité avec la programmation, les algorithmes et les 
+technologies de l'intelligence artificielle. \\
+\textbf{D3} & Intérêt pour la communication numérique, les 
+infrastructures réseau et les protocoles de télécommunication. \\
+\textbf{D4} & Passion pour les systèmes mécaniques intelligents, 
+la robotique et l'automatisation industrielle. \\
+\textbf{D5} & Sensibilité aux procédés de fabrication, à la chaîne 
+de production et à l'optimisation industrielle. \\
+\textbf{D6} & Aptitude à coordonner des équipes, planifier des projets 
+et organiser des ressources humaines. \\
+\textbf{D7} & Goût pour l'expérimentation scientifique, la modélisation 
+théorique et la rédaction de rapports techniques. \\
+\textbf{D8} & Conscience des risques systémiques, de la cybersécurité 
+et des contraintes environnementales. \\
+\bottomrule
+\end{tabular}
+\caption{Description des 8 dimensions comportementales du questionnaire}
+\label{tab:dimensions}
+\end{table}
+La Table~\ref{tab:dimensions} présente les huit dimensions comportementales évaluées par notre questionnaire. Ce référentiel permet de dresser un profil multidimensionnel de l'étudiant en couvrant l'ensemble des aptitudes requises par les filières de l'ENSA Safi, de la logique pure aux enjeux technologiques et environnementaux.
+
+Pour chaque dimension, on calcule la moyenne des z-scores des questions
+qui lui appartiennent. On obtient ainsi un vecteur de 8 scores
+dimensionnels $\vec{z} = (z_{D1}, z_{D2}, \ldots, z_{D8})$
+qui décrit le profil comportemental complet de l'étudiant,
+indépendamment de ses habitudes de notation.
+
+\item \textbf{Transformation Softmax :} Chaque filière est définie par un vecteur de poids sur les 8 dimensions (D1 à D8), traduisant l'importance de chaque aptitude pour cette filière. Ces poids sont répertoriés dans la Matrice de pondération dimensionnelle :
+
+Le tableau~\ref{tab:ponderation} montre la matrice de pondération pour chaque filière.
+
+\begin{table}[ht!]
+\centering
+\small
+\begin{tabularx}{\linewidth}{X c c c c c c c c}
+\toprule
+\rowcolor{brownmain!20} \textbf{Filière} & \textbf{D1} & \textbf{D2} & \textbf{D3} & \textbf{D4} & \textbf{D5} & \textbf{D6} & \textbf{D7} & \textbf{D8} \\
+\midrule
+\rowcolor{brownlight} GIIA   & 1.0 & 1.5 & 0.2 & 0.3 & 0.1 & 0.2 & 0.5 & 0.4 \\
+GTR    & 0.5 & 0.8 & 1.5 & 0.2 & 0.1 & 0.2 & 0.4 & 0.6 \\
+\rowcolor{brownlight} GINDUS & 0.3 & 0.4 & 0.1 & 0.5 & 1.5 & 1.2 & 0.3 & 0.6 \\
+GMSI   & 0.8 & 0.5 & 0.4 & 1.5 & 0.3 & 0.2 & 0.4 & 0.5 \\
+\rowcolor{brownlight} GATE   & 0.6 & 0.3 & 0.2 & 1.2 & 0.5 & 0.3 & 0.8 & 1.5 \\
+GPMA   & 0.4 & 0.2 & 0.1 & 0.3 & 1.2 & 0.4 & 1.5 & 0.6 \\
+\bottomrule
+\end{tabularx}
+\caption{Matrice de pondération dimensionnelle par filière}
+\label{tab:ponderation}
+\end{table}
+La Table~\ref{tab:ponderation} détaille les coefficients de pondération appliqués à chaque dimension pour les six filières de l'ENSA Safi. Ces poids permettent à l'algorithme de calculer un score d'adéquation précis, en privilégiant les aptitudes spécifiques à chaque spécialité.
+
+Pour déterminer la compatibilité de chaque filière, le calcul se déroule en deux étapes successives :
+\begin{itemize}
+    \item \textbf{Calcul du score brut $S_i$ :} Pour chaque filière $i$, on effectue le produit scalaire entre son vecteur de poids dimensionnels et le profil comportemental de l'étudiant, afin d'obtenir un score reflétant l'adéquation globale entre les aptitudes de l'étudiant et les exigences de la filière :
+    \begin{equation}
+        S_i = \sum_{k=1}^{8} w_{i,k} \cdot x_k
+    \end{equation}
+    où :
+    \begin{itemize}
+        \item $w_{i,k}$ : le poids de la filière $i$ sur la dimension $k$, tel que défini dans la matrice de pondération ci-dessus,
+        \item $x_k$ : le score z-normalisé moyen de l'étudiant sur la dimension $k$,
+        \item $k \in \{1, \ldots, 8\}$ : l'indice de la dimension comportementale.
+    \end{itemize}
+
+    \item \textbf{Normalisation par Softmax en probabilités $P(f_i)$ :} Les scores bruts $S_i$ obtenus ne sont pas directement comparables entre eux, car ils peuvent être négatifs ou de grandeurs très différentes. La fonction Softmax les convertit en probabilités de compatibilité comprises entre 0\% et 100\%, dont la somme vaut toujours 100\%, permettant une lecture claire et équitable du classement des filières :
+    \begin{equation}
+        P(f_i) = \frac{e^{S_i}}{\sum_{j=1}^{n} e^{S_j}}
+    \end{equation}
+    où :
+    \begin{itemize}
+        \item $P(f_i)$ : la probabilité de compatibilité de l'étudiant avec la filière $f_i$,
+        \item $S_i$ : le score brut de la filière $i$, calculé par la formule précédente,
+        \item $n$ : le nombre total de filières (ici $n = 6$),
+        \item $e^{S_j}$ : l'exponentielle du score brut de la filière $j$, assurant que toutes les valeurs sont positives avant normalisation.
+    \end{itemize}
 \end{itemize}
 
-% ============================================================
-\section{Méthodologie}
-% ============================================================
+\end{enumerate}
+\subsection{Architecture logicielle (MVC)}
 
-\subsection{Architecture générale}
+Pour garantir une maintenance aisée et une séparation claire des responsabilités, l'application suit l'architecture logicielle \textbf{Model-View-Controller (MVC)}. La Table~\ref{tab:mvc} présente la répartition des différents fichiers et technologies du projet selon ces trois couches.
 
-Le projet est construit selon le patron \textbf{Modèle--Vue--Contrôleur (MVC)}, réparti en trois
-couches distinctes :
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\linewidth}{L{2.5cm} L{4cm} X}
+\toprule
+\rowcolor{brownmain!20} \textbf{Couche} & \textbf{Technologie} & \textbf{Rôle} \\
+\midrule
+\rowcolor{brownlight} \textbf{Modèle (M)} & SQLite3 & Stockage persistant des données (étudiants, résultats, questions) \\
+\textbf{Vue (V)} & HTML5, CSS3, JS & Affichage des pages et interfaces utilisateur \\
+\rowcolor{brownlight} \textbf{Contrôleur (C)} & Python / Flask & Traitement des requêtes, logique métier, routage \\
+\textbf{Service IA} & API Mistral & Assistant conversationnel en langage naturel \\
+\bottomrule
+\end{tabularx}
+\caption{Couches de l'architecture MVC du projet}
+\label{tab:mvc}
+\end{table}
 
-\begin{itemize}
-    \item \textbf{Modèle} : base de données relationnelle SQLite3 stockant les
-          spécialités, les questions, les utilisateurs et les résultats de test.
-    \item \textbf{Vue} : templates HTML rendus côté serveur via le moteur Jinja2,
-          accompagnés de feuilles de style CSS et de scripts JavaScript.
-    \item \textbf{Contrôleur} : serveur Flask (Python) organisé en Blueprints,
-          gérant le routage, l'authentification, le calcul des scores et les API REST.
-\end{itemize}
-
+Cette organisation permet de découpler la logique métier (Flask) de l'interface utilisateur (Jinja2/CSS) et de la gestion des données (SQLite). Une telle structure facilite l'évolution du système, comme l'ajout futur de nouvelles fonctionnalités ou le remplacement de la base de données sans impacter l'affichage.
 \subsection{Organisation du code}
 
 Le projet est structuré selon les répertoires suivants :
 
-\begin{lstlisting}[language=bash, caption={Arborescence du projet}]
+\begin{lstlisting}[style=filetree, caption={Arborescence du projet}, captionpos=b]
 mini-projet/
 |-- backend/
-|   |-- app.py               # Point d'entree Flask
+|   |-- app.py               # Entree Flask
 |   |-- models/
-|   |   `-- database.py      # Connexion et initialisation SQLite
+|   |   |-- database.py      # SQLite
 |   |-- routes/
-|   |   |-- main_routes.py   # Routes principales (pages HTML)
-|   |   |-- api_routes.py    # API REST (test, chat, admin)
-|   |   `-- admin_routes.py  # Routes administration
+|   |   |-- main_routes.py   # Pages HTML
+|   |   |-- api_routes.py    # API REST
+|   |   |-- admin_routes.py  # Administration
 |   |-- services/
-|   |   `-- ai_service.py    # Integration Mistral AI
-|   `-- utils/
-|       |-- helpers.py       # Decorateurs et filtres
-|       `-- config.py        # DIMENSIONS, WEIGHTS, FILIERE_NAMES
+|   |   |-- ai_service.py    # Mistral AI
+|   |  
+|   |-- utils/
+|       |-- helpers.py       # Decorateurs Jinja2
+|       |-- config.py        # Configue globale
 |-- database/
-|   |-- schema.sql           # Schema de creation des tables
-|   |-- data.sql             # Donnees initiales (specialites, questions)
-|   `-- ensa_orientation.db  # Fichier SQLite genere
-`-- frontend/
+|   |-- schema.sql           # Tables SQL
+|   |-- data.sql             # Donnees initiales
+|   |-- ensa_orientation.db  # Fichier SQLite
+|-- frontend/
     |-- html/                # Templates Jinja2
-    |-- css/                 # Feuilles de style CSS
-    `-- js/                  # Scripts JavaScript
+    |-- css/                 # Styles CSS
+    |-- js/                  # Scripts JS
 \end{lstlisting}
 
-\subsection{Flux de données}
+\subsection{Diagramme de flux général}
+La figure~\ref{fig:flux_global} illustre le chemin emprunté par une requête depuis le navigateur de l’étudiant jusqu’à la réponse du serveur.
 
-Le cycle de vie d'une requête de l'utilisateur est le suivant :
-\begin{enumerate}
-    \item L'utilisateur envoie une requête HTTP depuis le navigateur.
-    \item Flask l'intercepte via le Blueprint correspondant, vérifie les droits
-          de session si nécessaire.
-    \item Le contrôleur exécute une requête SQL sur la base SQLite via \texttt{get\_db\_connection()}.
-    \item Les données sont injectées dans un template Jinja2 (rendu HTML côté serveur)
-          ou retournées au format JSON (API REST).
-    \item La réponse est transmise au navigateur, qui l'affiche ou la traite via JavaScript.
-\end{enumerate}
+% --- Définition des couleurs pour la figure ---
+\definecolor{ensablue}{HTML}{6B3A2A}   % brun foncé  (remplace bleu marine)
+\definecolor{ensalight}{HTML}{FDF6F0}  % crème chaud (remplace gris clair)
+\definecolor{accentgray}{HTML}{A0785A} % brun moyen  (remplace gris neutre)
+
+\begin{figure}[ht!]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  node distance=1cm,
+  box/.style={draw=ensablue, fill=ensalight, rounded corners=4pt, 
+              minimum width=2.8cm, minimum height=0.9cm, font=\small\bfseries, align=center},
+  db/.style={draw=ensablue, fill=white, rounded corners=2pt, 
+             minimum width=2.8cm, minimum height=0.9cm, font=\small, align=center},
+  arr/.style={-Stealth, thick, color=ensablue},
+  note/.style={font=\scriptsize\color{accentgray}, align=center}
+]
+  % Placement des nœuds avec espacement réduit
+  \node[box] (browser) {Navigateur\\étudiant};
+  \node[box, right=1.4cm of browser] (flask) {Serveur Flask\\(app.py)};
+  \node[box, right=1.4cm of flask]   (routes) {Blueprints\\(routes)};
+  \node[db,  below=1.2cm of routes]  (db)     {SQLite\\(database.py)};
+  \node[db,  right=1.4cm of routes]  (ai)     {Mistral AI\\(api externe)};
+
+  % Tracé des flux
+  \draw[arr] (browser) -- node[above,note]{HTTP} (flask);
+  \draw[arr] (flask)   -- node[above,note]{routage} (routes);
+  \draw[arr] (routes)  -- node[right,note]{CRUD} (db);
+  \draw[arr] (routes)  -- node[above,note]{/api/chat} (ai);
+  \draw[arr] (db)      -- (routes);
+  
+  % Flux de retour
+  \draw[arr, dashed] (ai) to[bend left=20] node[below,note]{JSON} (routes);
+  \draw[arr, dashed] (routes) to[bend right=35] node[below,note]{HTML/JSON} (browser);
+
+\end{tikzpicture}%
+}
+\caption{Flux général des données dans ENSA Guide}
+\label{fig:flux_global}
+\end{figure}
+La Figure 2 illustre le cycle de vie d'une requête au sein de la plateforme. On y observe le rôle central du serveur Flask qui orchestre les échanges : il réceptionne les requêtes HTTP du navigateur, interroge la base de données SQLite via les Blueprints pour la persistance, et sollicite l'API externe Mistral AI pour enrichir l'expérience utilisateur par une assistance intelligente en temps réel.
 
 % ============================================================
+\clearpage
 \section{Outils et technologies}
 % ============================================================
 
 \subsection{Backend : Python et Flask}
-
-Flask est utilisé comme micro-framework web. Son mécanisme de \textit{Blueprints} permet
+\begin{minipage}[c]{0.75\linewidth}
+Flask \cite{flask} est utilisé comme micro-framework web. Son mécanisme de \textit{Blueprints} permet
 de découper logiquement le code en modules indépendants (\texttt{main\_routes}, \texttt{api\_routes},
-\texttt{admin\_routes}). La bibliothèque \textbf{NumPy} est employée pour les calculs vectoriels
+\texttt{admin\_routes}). La bibliothèque \textbf{NumPy} \cite{numpy} est employée pour les calculs vectoriels
 du test d'orientation (normalisation par z-scores, softmax). La sécurité des mots de passe est
-assurée par \texttt{werkzeug.security} avec hachage \textit{scrypt}.
+assurée par \texttt{werkzeug.security} \cite{werkzeug} avec hachage \textit{scrypt}. Le langage Python \cite{python} apporte une flexibilité remarquable.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.15\linewidth}
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/python.png}\\[0.2cm]
+    \includegraphics[width=0.8\linewidth]{images/logo_flask_python.png}
+\end{minipage}
 
+\vspace{0.4cm}
 \subsection{Base de données : SQLite3}
-
-SQLite3 est retenu pour sa légèreté et son intégration native en Python, sans serveur externe
+\begin{minipage}[c]{0.75\linewidth}
+SQLite3 \cite{sqlite} est retenu pour sa légèreté et son intégration native en Python, sans serveur externe
 à configurer. Le fichier \texttt{ensa\_orientation.db} est généré automatiquement au démarrage
 si absent, à partir du schéma (\texttt{schema.sql}) et des données initiales (\texttt{data.sql}).
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.15\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/logo_sqlite.png}
+\end{minipage}
 
+\vspace{0.4cm}
 \subsection{Frontend : HTML5, CSS3 et JavaScript}
-
-L'interface est développée en HTML/CSS/JavaScript sans framework tiers. Le moteur de templates
-Jinja2 permet le rendu dynamique des pages côté serveur. L'API \texttt{Fetch} JavaScript est
+\begin{minipage}[c]{0.75\linewidth}
+L'interface est développée en HTML/CSS/JavaScript \cite{mdn} sans framework tiers. Le moteur de templates
+Jinja2 \cite{jinja} permet le rendu dynamique des pages côté serveur. L'API \texttt{Fetch} JavaScript est
 utilisée pour les interactions asynchrones (soumission du test, chatbot).
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.15\linewidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/logo_html_css_js.png}
+\end{minipage}
 
+\vspace{0.4cm}
 \subsection{Intelligence artificielle : Mistral AI}
-
-Le chatbot est connecté à l'API Mistral AI via un service dédié (\texttt{ai\_service.py}).
-En cas d'indisponibilité de l'API, un message de repli est retourné à l'utilisateur.
-
+\begin{minipage}[c]{0.75\linewidth}
+Le chatbot est connecté à l'API Mistral AI \cite{mistral} via le service dédié \texttt{ai\_service.py},
+en utilisant le modèle \textbf{\texttt{mistral-tiny}}. Chaque requête est précédée d'un
+\textit{system prompt} définissant le rôle de l'assistant : orientation exclusive vers les
+six filières de l'ENSA Safi, réponses concises (2 à 3 phrases), sans formatage Markdown,
+avec empathie. En cas d'indisponibilité de l'API (timeout, erreur HTTP), un message de
+repli explicite est retourné à l'utilisateur, garantissant la continuité de l'expérience.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.15\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/logo_mistral.png}
+\end{minipage}
 % ============================================================
+\clearpage
 \section{Implémentation}
 % ============================================================
+
 
 \subsection{Schéma de la base de données}
 
 La base de données comporte quatre tables principales, définies dans \texttt{schema.sql} :
 
-\begin{lstlisting}[language=SQL, caption={Extrait du schéma SQL (schema.sql)}]
+% UPDATED: caption clarified — inline comments are annotations for readability, not present in schema.sql
+\begin{lstlisting}[language=SQL]
 CREATE TABLE specialties (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    code        TEXT NOT NULL UNIQUE,
-    name        TEXT NOT NULL,
-    description TEXT NOT NULL,
-    career_paths TEXT,
-    subjects    TEXT,
-    additional_info TEXT   -- JSON : programme annee par annee
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    code            TEXT    NOT NULL UNIQUE,
+    name            TEXT    NOT NULL,
+    description     TEXT    NOT NULL,
+    career_paths    TEXT,
+    subjects        TEXT,
+    additional_info TEXT    -- JSON : programme par annee et semestre
 );
 
 CREATE TABLE questions (
-    id       INTEGER PRIMARY KEY AUTOINCREMENT,
-    texte    TEXT NOT NULL,
-    texte_en TEXT,
-    texte_ar TEXT,
-    dimensions TEXT NOT NULL  -- ex. 'D2,D3'
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    texte      TEXT    NOT NULL,
+    texte_en   TEXT,             -- traduction anglaise
+    texte_ar   TEXT,             -- traduction arabe
+    dimensions TEXT    NOT NULL  -- ex. 'D1,D3'
 );
 
 CREATE TABLE users (
-    id             INTEGER PRIMARY KEY AUTOINCREMENT,
-    email          TEXT UNIQUE NOT NULL,
-    access_code    TEXT NOT NULL,   -- hache via scrypt
-    nom_complet    TEXT,
-    role           TEXT,
-    is_active      INTEGER DEFAULT 1,
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    email            TEXT    UNIQUE NOT NULL,
+    access_code      TEXT    NOT NULL,   -- hache via werkzeug scrypt
+    nom_complet      TEXT,
+    role             TEXT,               -- 'student' ou 'admin'
+    is_active        INTEGER DEFAULT 1,
     last_result_json TEXT,
-    profile_type   TEXT,
-    date_test      DATETIME
+    profile_type     TEXT,
+    date_test        DATETIME
 );
+\end{lstlisting}
 
+\begin{lstlisting}[language=SQL, caption={Schéma SQL complet (schema.sql)}, captionpos=b, firstnumber=30]
 CREATE TABLE results (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id      INTEGER,
     date_test    DATETIME,
     result_json  TEXT,
     profile_type TEXT,
-    duration     INTEGER,
+    duration     INTEGER,          -- duree du test en secondes
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
 \end{lstlisting}
-
-Le champ \texttt{additional\_info} de la table \texttt{specialties} contient un objet JSON
-décrivant le programme pédagogique complet de la filière sur trois ans (six semestres),
-avec la liste des modules par semestre.
-
+Le champ \texttt{additional\_info} de \texttt{specialties} contient un JSON du programme sur trois ans.
 \subsection{Initialisation de la base de données}
-
-L'initialisation est déclenchée au démarrage du serveur via \texttt{init\_db()}.
-Si le fichier SQLite est absent, le schéma et les données sont chargés automatiquement :
-
-\begin{lstlisting}[language=Python, caption={Initialisation de la base (database.py)}]
-import sqlite3
-import os
-
-DB_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-    'database', 'ensa_orientation.db'
-)
-
+% UPDATED: replaced placeholder ellipsis with actual path resolution pattern
+\begin{lstlisting}[language=Python, caption={Initialisation de la base de données (database.py)},captionpos=b]
+import sqlite3, os
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+DB_PATH = os.path.join(ROOT, 'database', 'ensa_orientation.db')
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
-
 def init_db():
     if not os.path.exists(DB_PATH):
         conn = get_db_connection()
-        schema_path = os.path.join(..., 'database', 'schema.sql')
-        with open(schema_path, 'r', encoding='utf-8') as f:
-            conn.executescript(f.read())
-        data_path = os.path.join(..., 'database', 'data.sql')
-        if os.path.exists(data_path):
-            with open(data_path, 'r', encoding='utf-8') as f:
+        try:
+            schema_path = os.path.join(ROOT, 'database', 'schema.sql')
+            with open(schema_path, 'r', encoding='utf-8') as f:
                 conn.executescript(f.read())
-        conn.close()
+            data_path = os.path.join(ROOT, 'database', 'data.sql')
+            if os.path.exists(data_path):
+                with open(data_path, 'r', encoding='utf-8') as f:
+                    conn.executescript(f.read())
+        except Exception as e:
+            print(f"Schema error: {e}")
+        finally:
+            conn.close()
+\end{lstlisting}
+L'initialisation est déclenchée au démarrage du serveur via \texttt{init\_db}.
+Si le fichier SQLite est absent, le schéma et les données sont chargés automatiquement.
+\noindent\textbf{Remarque :} ce mécanisme crée un problème connu~: si la base de données
+existe déjà, les modifications apportées à \texttt{data.sql} ne sont \emph{pas} appliquées
+automatiquement. L'utilisateur doit supprimer manuellement le fichier \texttt{.db} pour
+forcer la réinitialisation.
+
+\subsection{Initialisation de l'application Flask}
+
+Le fichier \texttt{app.py} adopte le patron \textit{Application Factory} via \texttt{create\_app},
+isolant la configuration Flask pour faciliter les tests et le déploiement multi-environnement.
+Il définit les chemins absolus des templates Jinja2 et fichiers statiques, enregistre les trois
+Blueprints, déclare un filtre \texttt{from\_json} pour le décodage JSON dans les templates,
+expose une route \texttt{/assets/<filename>} pour les ressources graphiques, et injecte
+automatiquement \texttt{user}, \texttt{logged\_in} et \texttt{role} dans tous les templates
+via \texttt{inject\_user}.
+\begin{lstlisting}[language=Python, caption={Fabrique d'application et enregistrement des Blueprints (app.py)},captionpos=b]
+def create_app():
+    base_dir     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    template_dir = os.path.join(base_dir, 'frontend', 'html')
+    static_dir   = os.path.join(base_dir, 'frontend')
+
+    app = Flask(__name__,
+                template_folder=template_dir,
+                static_folder=static_dir,
+                static_url_path='/static')
+
+    app.secret_key = 'ensa_safi_secret_key'
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+    app.config['SESSION_COOKIE_HTTPONLY']    = True
+    app.config['SESSION_COOKIE_SAMESITE']    = 'Lax'
+
+    init_db()
+    app.template_filter('from_json')(from_json_filter)
+    app.register_blueprint(main_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(api_bp)
+    return app
 \end{lstlisting}
 
-\noindent\textbf{Remarque :} ce mécanisme crée un problème connu~: si la base de données existe déjà,
-les modifications apportées à \texttt{data.sql} ne sont \emph{pas} appliquées automatiquement.
-L'utilisateur doit supprimer manuellement le fichier \texttt{.db} pour forcer la réinitialisation.
+
+
+\subsection{Authentification et gestion des sessions}
+
+La route \texttt{/login} (méthode POST) implémente un flux d'authentification
+séquentiel. Avant toute interrogation de la base, l'adresse e-mail est validée
+pour s'assurer qu'elle appartient au domaine académique (\texttt{@uca.ac.ma} ou
+\texttt{@ensas.uca.ma}). La vérification du code d'accès est ensuite réalisée
+par \texttt{check\_password\_hash} de \texttt{werkzeug.security}, qui supporte
+nativement l'algorithme \textit{scrypt}. Un compte désactivé (\texttt{is\_active = 0})
+est rejeté avec un message explicite, indépendamment de la validité du code.
+\begin{lstlisting}[language=Python, caption={Flux d'authentification simplifié (main\_routes.py)}, captionpos=b]
+if not email.endswith('@uca.ac.ma') and \\
+   not email.endswith('ensas.uca.ma'):
+    return render_template('login.html',
+                           error="Email academique requis")
+
+user = conn.execute(
+    'SELECT * FROM users WHERE email = ?', (email,)
+).fetchone()
+
+if user and check_password_hash(user['access_code'], code):
+    if user['is_active'] == 0:
+        flash('Compte desactive par l\'administrateur.', 'error')
+        return render_template('login.html')
+    session.clear()
+    session['user_id']   = user['id']
+    session['user_name'] = user['nom_complet'] or email.split('@')[0]
+    session['role']      = user['role'] or 'student'
+    if session['role'] == 'admin':
+        return redirect(url_for('admin_routes.admin_analytics'))
+\end{lstlisting}
+
+Un mécanisme de \textit{fusion de session} complète ce flux~: si l'utilisateur a
+effectué le test d'orientation \emph{avant} de se connecter, ses résultats temporaires
+--- stockés dans \texttt{session['temp\_results']} --- sont automatiquement persistés
+en base de données dès l'authentification réussie. Ce comportement garantit qu'aucune
+donnée n'est perdue lors d'une connexion tardive.
 
 \subsection{Rendu dynamique des fiches de spécialité}
 
-La route \texttt{/filiere/<code\_filiere>} récupère la spécialité correspondante en base et
-effectue un mappage vers les noms de champs attendus par le template Jinja2 :
-
-\begin{lstlisting}[language=Python, caption={Route de rendu des fiches (main\_routes.py)}]
+La route \texttt{/filiere/<code\_filiere>} récupère la spécialité par son code dans
+la table \texttt{specialties} et effectue un mappage explicite vers les noms de champs
+attendus par le template Jinja2 :
+\newpage
+\begin{lstlisting}[language=Python, caption={Route de rendu des fiches de spécialité (main\_routes.py)},captionpos=b]
 @main_bp.route('/filiere/<code_filiere>')
 def filiere_detail(code_filiere):
     conn = get_db_connection()
@@ -348,20 +935,23 @@ def filiere_detail(code_filiere):
         (code_filiere,)
     ).fetchone()
     conn.close()
-
     if filiere:
         mapped_filiere = {
-            'code':         filiere['code'],
-            'nom':          filiere['name'],
-            'description':  filiere['description'],
-            'debouches':    filiere['career_paths'],
-            'mots_cles':    filiere['subjects'],
+            'code':           filiere['code'],
+            'nom':            filiere['name'],
+            'description':    filiere['description'],
+            'debouches':      filiere['career_paths'],
+            'mots_cles':      filiere['subjects'],
             'formation_json': filiere['additional_info']
         }
-        return render_template('filiere_detail.html',
-                               filiere=mapped_filiere)
+        return render_template('filiere_detail.html', filiere=mapped_filiere)
     return "Filiere non trouvee", 404
 \end{lstlisting}
+
+Ce mappage constitue une couche d'adaptation entre le schéma SQL anglophone adopté lors
+de la migration et les templates Jinja2 initialement conçus avec des noms de champs
+francophones. Il isole les templates de toute modification ultérieure du schéma,
+conformément au principe de découplage entre la présentation et la persistance des données.
 
 \subsection{Calcul du score d'orientation}
 
@@ -391,10 +981,13 @@ La formule appliquée est :
     S(f) = \sum_{d \in D} w_{f,d} \cdot \bar{z}_d
 \end{equation}
 
-où $w_{f,d}$ est le poids de la filière $f$ sur la dimension $d$ et $\bar{z}_d$ est le
-score z-normalisé moyen de la dimension $d$.
-
-\begin{lstlisting}[language=Python, caption={Calcul softmax des scores (api\_routes.py)}]
+où :
+\begin{itemize}
+    \item $\boldsymbol{w_{f,d}}$ : le poids de la filière $f$ sur la dimension $d$,
+    \item $\boldsymbol{\bar{z}_d}$ : le score z-normalisé moyen de la dimension $d$.
+\end{itemize}
+Ces poids, définis statiquement dans le fichier \texttt{config.py}, encodent l'affinité dimensionnelle de chaque filière. Ils correspondent aux coefficients détaillés précédemment dans la \textbf{Table~\ref{tab:ponderation}} (page~\pageref{tab:ponderation}), qui servent de base au calcul du score d'adéquation.
+\begin{lstlisting}[language=Python, caption={Calcul softmax des scores de compatibilité (api\_routes.py)},captionpos=b]
 # Ponderation par filiere
 filiere_scores = {}
 for f_code, weights in WEIGHTS.items():
@@ -411,119 +1004,609 @@ probabilities = {
 }
 \end{lstlisting}
 
-% ============================================================
-\section{Interface utilisateur}
-% ============================================================
-
-\subsection{Structure de la navigation}
-
-L'application est composée des pages suivantes :
+Une fois les probabilités calculées, un type de profil est déterminé selon trois
+cas mutuellement exclusifs et persisté dans la table \texttt{results}~:
 \begin{itemize}
-    \item \textbf{Accueil (\texttt{/})} : section \textit{hero} avec statistiques, puis
-          grille des six filières (cartes cliquables).
-    \item \textbf{Fiche filière (\texttt{/filiere/<code>})} : description complète,
-          programme par année et semestre, débouchés professionnels et mots-clés.
-    \item \textbf{Test d'orientation (\texttt{/test-orientation})} : questionnaire
-          paginé, barre de progression, rendu des résultats.
-    \item \textbf{Tableau de bord (\texttt{/dashboard})} : historique des tests,
-          profil calculé sur l'ensemble des résultats passés.
-    \item \textbf{Administration (\texttt{/admin})} : gestion des étudiants, activation/
-          désactivation des comptes, visualisation des statistiques globales.
+    \item \textbf{Spécialiste} \texttt{<code>} : si la filière en tête dépasse 40\,\%
+          de compatibilité.
+    \item \textbf{Profil Hybride} \texttt{<code1>/<code2>} : si l'écart entre les deux
+          premières filières est inférieur à 5 points de pourcentage.
+    \item \textbf{Profil Équilibré} : dans tous les autres cas.
 \end{itemize}
 
-\subsection{Expérience utilisateur (UX)}
+\subsection{Tableau de bord étudiant}
 
-Les choix de design visent à réduire la friction d'usage :
+Le tableau de bord constitue l'espace personnel de l'étudiant authentifié au sein de la plateforme. Accessible via la route \texttt{/dashboard}, protégée par une vérification stricte de session côté serveur, cette interface centralise l'ensemble des données propres à l'utilisateur et lui en restitue une lecture structurée et exploitable.
+
+Lorsqu'un étudiant a effectué plusieurs passages du test d'orientation, la route agrège l'intégralité de l'historique stocké dans la table \texttt{results} et calcule dynamiquement un \textbf{profil global consolidé}. Ce profil est obtenu en moyennant, filière par filière, les scores de compatibilité issus de l'ensemble des tests réalisés, puis en appliquant les mêmes règles de classification que pour un test individuel --- à savoir la détermination d'un profil Spécialiste, Hybride ou Équilibré selon les seuils définis. 
+
+Afin de mieux visualiser ce processus de traitement des données historiques, le schéma suivant détaille le mécanisme d'agrégation mis en œuvre:
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  every node/.style={font=\small},
+  bloc/.style={draw=brownmain, fill=brownlight, rounded corners=5pt,
+               minimum width=3.2cm, minimum height=1.1cm, align=center, line width=0.8pt},
+  procstep/.style={draw=brownmain, fill=white, rounded corners=5pt,
+               minimum width=5.5cm, minimum height=1.1cm, align=center, line width=0.8pt},
+  arr/.style={-Stealth, thick, color=brownmain},
+  lbl/.style={font=\scriptsize\color{brownmid}, align=center}
+]
+
+%% --- Ligne 1 : historique tests (horizontalement centrée) ---
+\node[bloc] (t1) at (-4, 0) {\textbf{Test 1} \\ \scriptsize résultats JSON};
+\node[bloc] (t2) at ( 0, 0) {\textbf{Test 2} \\ \scriptsize résultats JSON};
+\node[bloc] (tn) at ( 4, 0) {\textbf{Test N} \\ \scriptsize résultats JSON};
+
+%% --- Encadrement manuel des Tests ---
+\draw[draw=brownmid, dashed, rounded corners=6pt, line width=0.7pt]
+  (-6, 0.9) rectangle (6, -0.9);
+\node[lbl] at (0, 1.1) {Historique étudiant — table \texttt{results}};
+
+%% --- Ligne 2 : agrégation ---
+\node[procstep] (agg) at (0, -2.5)
+  {\textbf{Agrégation} \\ \scriptsize filière par filière (moyenne des scores)};
+
+%% --- Ligne 3 : profil global ---
+\node[procstep] (profil) at (0, -4.7)
+  {\textbf{Profil global} \\ \scriptsize consolidé};
+
+%% --- Ligne 4 : classification ---
+\node[bloc, minimum width=6cm] (classif) at (0, -6.9)
+  {\textbf{Classification} \\ \scriptsize Spécialiste / Hybride / Équilibré};
+
+%% --- Flèches vers agrégation ---
+\draw[arr] (t1.south) -- ++(0,-0.6) -| (agg.north);
+\draw[arr] (t2.south) -- (agg.north);
+\draw[arr] (tn.south) -- ++(0,-0.6) -| (agg.north);
+
+%% --- Flèches descendantes principales ---
+\draw[arr] (agg)    -- node[right, lbl]{calcul du score moyen} (profil);
+\draw[arr] (profil) -- node[right, lbl]{seuils : 40\% et 5~pts} (classif);
+
+\end{tikzpicture}
+\caption{Flux d'agrégation des résultats dans le tableau de bord étudiant}
+\label{fig:dashboard_flow}
+\vspace{0.3cm}
+\end{figure}
+
+Cette analyse permet d'obtenir des résultats plus fiables. En réduisant l'effet des variations temporaires (comme l'humeur ou les conditions du test), elle met en évidence les véritables préférences de l'étudiant. Ainsi, l'étudiant peut identifier une orientation plus stable et suivre l'évolution de son profil dans le temps.
+\newpage
+
+\subsection{Module d'administration}
+
+Le module d'administration offre à l'administrateur de la plateforme un environnement
+de supervision complet, articulé autour de deux routes distinctes, toutes deux protégées
+par le décorateur \texttt{@admin\_required}, qui contrôle l'accès au niveau de chaque
+requête HTTP et redirige systématiquement tout utilisateur non habilité.
+
+\textbf{Page analytique (\texttt{/admin/analytics})}~: cette vue interroge l'ensemble
+de la table \texttt{results} afin de produire trois indicateurs statistiques injectés
+dans le template via le dictionnaire \texttt{chart\_data}~:
 \begin{itemize}
-    \item La page d'accueil présente immédiatement les six filières en grille visuelle,
-          sans nécessiter de navigation.
-    \item Le test d'orientation est présenté question par question avec une barre
-          de progression, afin de ne pas décourager l'utilisateur.
-    \item Les résultats sont affichés sous forme de pourcentages de compatibilité
-          classés par ordre décroissant, accompagnés d'un profil textuel
-          (Spécialiste, Hybride ou Équilibré).
-    \item Un widget de chatbot flottant est accessible sur toutes les pages,
-          permettant de poser des questions contextuelles sans quitter la page en cours.
+    \item Un \textbf{histogramme} représentant la répartition des recommandations
+          par filière, permettant d'identifier les orientations les plus fréquemment
+          attribuées au sein de la promotion.
+    \item Un \textbf{diagramme en anneau} illustrant la distribution des profils
+          types (Spécialiste, Hybride, Équilibré) et reflétant la diversité des
+          configurations cognitives et motivationnelles de la population étudiante.
+    \item Une \textbf{courbe de tendance mensuelle} visualisant l'évolution du volume
+          de tests réalisés dans le temps, utile pour évaluer l'adoption de la plateforme.
 \end{itemize}
 
-\subsection{Limitations et problèmes rencontrés}
+La figure~\ref{fig:admin_architecture} résume l'architecture globale de ce module d'administration. Afin d'assurer une gestion rigoureuse de la plateforme, ce module centralise le pilotage des données et la supervision des utilisateurs via une interface sécurisée, reposant sur des routes protégées et une API REST dédiée.
 
-Plusieurs dysfonctionnements ont été identifiés lors des phases de test :
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  every node/.style={font=\small},
+  garde/.style={draw=brownmain, fill=brownmain!20, rounded corners=5pt,
+                minimum width=6cm, minimum height=1cm, align=center, line width=0.8pt},
+  route/.style={draw=brownmain, fill=brownlight, rounded corners=5pt,
+                minimum width=5cm, minimum height=1cm, align=center, line width=0.8pt},
+  kpi/.style={draw=brownmid, fill=white, rounded corners=4pt,
+              minimum width=4.5cm, minimum height=0.9cm, align=center, line width=0.7pt},
+  api/.style={draw=brownmid, fill=brownlight!60, rounded corners=4pt,
+              minimum width=4.5cm, minimum height=0.9cm, align=center, line width=0.7pt},
+  arr/.style={-Stealth, thick, color=brownmain},
+]
 
+\node[garde] (guard) at (5, 0)
+  {\texttt{@admin\_required} \\ \scriptsize contrôle d'accès HTTP};
+
+% Routes
+\node[route] (analytics) at (1.5, -2) {\texttt{/admin/analytics} \\ \scriptsize Page analytique};
+\node[route] (users)     at (8.5, -2) {\texttt{/admin/users} \\ \scriptsize Gestion des comptes};
+
+\draw[arr] (guard.south) -- ++(0,-0.5) -| (analytics.north);
+\draw[arr] (guard.south) -- ++(0,-0.5) -| (users.north);
+
+% Analytics children
+\node[kpi] (bar)   at (4, -3.8) {Histogramme \\ \scriptsize répartition par filière};
+\node[kpi] (donut) at (4, -5.2) {Diagramme anneau \\ \scriptsize distribution profils};
+\node[kpi] (trend) at (4, -6.6) {Courbe de tendance \\ \scriptsize volume mensuel};
+\node[api] (csv)   at (4, -8.0) {\texttt{GET} export\_csv \\ \scriptsize données brutes CSV};
+
+\draw[thick, color=brownmain] (analytics.south) -- (1.5, -8.0);
+\draw[arr] (1.5, -3.8) -- (bar.west);
+\draw[arr] (1.5, -5.2) -- (donut.west);
+\draw[arr] (1.5, -6.6) -- (trend.west);
+\draw[arr] (1.5, -8.0) -- (csv.west);
+
+% Users children
+\node[api] (add)    at (11, -3.8) {\texttt{POST} add\_student \\ \scriptsize Créer un compte};
+\node[api] (toggle) at (11, -5.2) {\texttt{POST} toggle\_user \\ \scriptsize Activer / désactiver};
+\node[api] (del)    at (11, -6.6) {\texttt{DELETE} delete\_user \\ \scriptsize Supprimer compte};
+
+\draw[thick, color=brownmain] (users.south) -- (8.5, -6.6);
+\draw[arr] (8.5, -3.8) -- (add.west);
+\draw[arr] (8.5, -5.2) -- (toggle.west);
+\draw[arr] (8.5, -6.6) -- (del.west);
+
+\end{tikzpicture}
+\caption{Architecture du module d'administration : routes protégées, indicateurs et API REST}
+\label{fig:admin_architecture}
+\vspace{0.3cm}
+\end{figure}
+
+Comme l'illustre la Figure~\ref{fig:admin_architecture}, le module est scindé en deux piliers fonctionnels : le volet analytique (KPIs) et la gestion des utilisateurs (\texttt{/admin/users}). Cette interface permet de suivre dynamiquement le nombre de tests effectués et la filière conseillée pour chaque profil.
+
+L'administrateur dispose d'un contrôle total via une API REST dédiée :
+
+{\small
+\begin{itemize}[leftmargin=1cm, labelsep=0.2cm, nosep]
+    \item \textbf{Création} d'un nouveau compte étudiant (\texttt{POST /api/add\_student}).
+    \item \textbf{Activation/Désactivation} d'un compte (\texttt{POST /api/toggle\_user/<id>}).
+    \item \textbf{Réinitialisation} du code d'accès (\texttt{POST /api/update\_password}).
+    \item \textbf{Suppression} entraînant la purge de l'historique (\texttt{DELETE /api/delete\_user/<id>}).
+\end{itemize}
+}
+
+\vspace{0.3cm}
+\noindent
+\begin{infobox}
+\textbf{Sécurité :} Une garde logicielle explicite bloque toute tentative de suppression d'un compte disposant du rôle \texttt{admin}, préservant ainsi l'intégrité de l'accès à la plateforme.
+\end{infobox}
+\subsection{Service d'intelligence artificielle}
+
+Le service d'assistance conversationnelle constitue l'un des éléments différenciateurs
+de la plateforme. Implémenté au sein du module \texttt{ai\_service.py}, il expose un
+assistant virtuel spécialisé, directement accessible depuis un widget flottant présent
+sur l'ensemble des pages de l'application. Son objectif est de permettre à l'étudiant
+d'obtenir des réponses ciblées à ses interrogations d'orientation, en langage naturel,
+sans nécessiter de navigation supplémentaire.
+
+Le service repose sur l'API Mistral AI, interrogée via des requêtes HTTP POST
+adressées à l'endpoint \texttt{https://api.mistral.ai/v1/chat/completions}.
+Le modèle \texttt{mistral-tiny} est sélectionné pour son équilibre entre rapidité
+de traitement et qualité de génération. 
+
+Chaque requête envoyée à l’assistant est précédée d’un message spécial (\textit{system prompt}) qui définit son rôle. L’assistant doit uniquement répondre sur les six filières de l’ENSA Safi, en 2 à 3 phrases, sans utiliser de formatage.
+
+Ensuite, l’application nettoie automatiquement la réponse pour supprimer les éléments inutiles (comme \texttt{**} ou \texttt{*}), afin d’afficher un texte propre dans l’interface.
+
+Le système gère également les erreurs afin d’assurer un bon fonctionnement :
 \begin{itemize}
-    \item \textbf{CSS non chargé sur certaines routes} : Flask est configuré avec
-          \texttt{static\_url\_path='/static'}, mais certains templates utilisent
-          des chemins relatifs pour les feuilles de style. Sur des routes imbriquées
-          (ex. \texttt{/filiere/GIIA}), le navigateur interprète ces chemins
-          différemment, provoquant l'échec du chargement du CSS et la disparition
-          totale de la mise en page.
-    \item \textbf{Synchronisation SQL non automatique} : Le mécanisme \texttt{init\_db()}
-          ne s'exécute que si le fichier \texttt{.db} est absent. Toute modification
-          dans \texttt{data.sql} reste donc invisible tant que la base n'est pas
-          supprimée manuellement et régénérée.
-    \item \textbf{Responsivité partielle} : La mise en page fonctionne correctement
-          sur bureau (grille à trois colonnes). Sur mobile, certaines pages de filière
-          présentent des débordements de texte et des éléments non réorganisés,
-          faute de règles \texttt{@media} suffisamment granulaires.
+    \item \textbf{Délai dépassé} : l’utilisateur est invité à réessayer plus tard.
+    \item \textbf{Erreur de l’API} : un message indique que le service est temporairement indisponible.
+    \item \textbf{Erreur imprévue} : un message simple est affiché sans montrer de détails techniques.
+\end{itemize}
+La figure~\ref{fig:ai_pipeline} illustre le pipeline complet de traitement de ces requêtes conversationnelles. Ce schéma détaille le flux de données, depuis l'interaction initiale de l'utilisateur jusqu'à la restitution d'une réponse enrichie par l'intelligence artificielle, tout en assurant une continuité de service en cas d'incident technique.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  every node/.style={font=\normalsize},
+  stage/.style={draw=brownmain, fill=brownlight, rounded corners=5pt,
+                minimum width=5cm, minimum height=1.1cm, align=center, line width=0.8pt},
+  ext/.style={draw=brownmid, fill=white, rounded corners=5pt,
+              minimum width=5cm, minimum height=1.1cm, align=center, line width=0.9pt},
+  arr/.style={-Stealth, thick, color=brownmain},
+  note/.style={font=\small\color{brownmid}, align=center},
+  err/.style={draw=codered!70, fill=codered!8, rounded corners=5pt,
+              minimum width=5.5cm, minimum height=1.2cm, align=center, line width=0.7pt}
+]
+
+\node[stage] (widget)   at (0, 0)     {\textbf{Widget flottant} \\ \small message étudiant};
+\node[stage] (route)    at (0, -2.0)  {\textbf{Route Flask} \\ \small \texttt{/api/chat}};
+\node[ext]   (mistral)  at (0, -4.0)  {\textbf{API Mistral AI} \\ \small \texttt{mistral-tiny}};
+\node[stage] (postproc) at (0, -6.0)  {\textbf{Post-traitement} \\ \small nettoyage Markdown};
+\node[stage] (html)     at (0, -8.0)  {\textbf{Réponse HTML} \\ \small interface chat};
+
+\draw[arr] (widget) -- node[right, note]{JSON} (route);
+\draw[arr] (route) -- node[right, note]{POST HTTP} (mistral);
+\draw[arr] (mistral) -- node[right, note]{JSON} (postproc);
+\draw[arr] (postproc) -- node[right, note]{texte} (html);
+
+\node[err, anchor=west] (errs) at (3.5, -6.5)
+  {\textbf{Gestion des erreurs} \\
+   \small Timeout \;·\; HTTPError \\ \small Exception imprévue \\
+   $\Rightarrow$ \textbf{repli en français}};
+   
+\draw[-Stealth, thick, color=codered!70] (mistral.south east) |- (errs.west);
+\draw[-Stealth, thick, color=codered!70] (errs.south) |- (html.east);
+
+\end{tikzpicture}
+\caption{Pipeline de traitement des requêtes du service d'intelligence artificielle}
+\label{fig:ai_pipeline}
+\vspace{0.3cm}
+\end{figure}
+\FloatBarrier
+
+Comme l'illustre ce schéma, le serveur Flask joue le rôle de chef d'orchestre. Il reçoit les messages de l'étudiant, les prépare pour l'API Mistral AI, puis nettoie la réponse reçue pour qu'elle s'affiche correctement dans le chat. De plus, un système de sécurité est en place : si l'API met trop de temps à répondre ou rencontre une erreur, le serveur envoie automatiquement un message de secours. Cela garantit que l'étudiant reçoive toujours une réponse, même simplifiée, au lieu d'un message d'erreur.
+% ============================================================
+\clearpage
+\section{Interface}
+% ============================================================
+
+% ----------------------------------------------------------
+\subsection{Accueil}
+% ----------------------------------------------------------
+
+\textbf{Route :} \texttt{/}
+
+\textbf{Overview :}
+Page d'entrée de la plateforme, présentant les statistiques globales et offrant un accès
+direct aux six filières de l'ENSA Safi via une grille de cartes interactives.
+
+\textbf{Key Elements :}
+\begin{itemize}
+    \item Section \textit{hero} avec indicateurs statistiques (tests, filières).
+    \item Grille de six cartes cliquables, une par filière (GIIA, GTR, GINDUS, GMSI, GPMA, GATE).
+    \item Barre de navigation avec liens vers le test d'orientation, la connexion et le tableau de bord.
+    \item Appel à l'action (CTA) invitant l'utilisateur à démarrer le test d'orientation.
+\end{itemize}
+\textbf{Interface Description :}
+La page est structurée en deux blocs verticaux principaux. Le \textit{hero} occupe la partie supérieure
+avec un fond dégradé, un titre prominent et trois compteurs dynamiques injectés par Jinja2. En dessous,
+une grille CSS à trois colonnes affiche les cartes de filière, chacune composée d'une icône, d'un code
+court, d'un intitulé et d'un lien vers la fiche détaillée. La navbar est fixe et adaptative, intégrant
+Le statut de connexion de l'utilisateur y est également affiché (bouton \textit{Connexion} ou \textit{Mon espace}). La figure~\ref{fig:accueil_hero} présente la section hero de la page d'accueil, tandis que la figure~\ref{fig:accueil_grille} expose la grille de présentation des filières.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{images/Image1.png}
+\caption{Page d'accueil — section hero}
+\label{fig:accueil_hero}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{images/Image2.png}
+\caption{Page d'accueil — grille des six filières}
+\label{fig:accueil_grille}
+\end{figure}
+
+% ----------------------------------------------------------
+\subsection{Fiche filière}
+% ----------------------------------------------------------
+
+\textbf{Route :} \texttt{/filiere/<code>}
+
+\textbf{Overview :}
+Page de détail d'une filière, présentant l'intégralité des informations académiques et
+professionnelles permettant à l'étudiant de prendre une décision éclairée.
+
+\textbf{Key Elements :}
+\begin{itemize}
+    \item Description générale et identité de la filière.
+    \item Programme structuré par année et semestre.
+    \item Débouchés professionnels sous forme de liste.
+    \item Mots-clés thématiques (domaines de compétence associés).
 \end{itemize}
 
+\textbf{Interface Description :}
+La mise en page adopte un layout deux colonnes : une barre latérale (sidebar) à gauche regroupant
+les métadonnées de la filière (code, mots-clés, débouchés) et une zone principale à droite
+affichant la description et le programme détaillé. Le programme est rendu dynamiquement
+à partir du JSON \texttt{additional\_info} via le filtre Jinja2 \texttt{from\_json},
+organisé en blocs d'accordéon ou de tableaux par semestre. Un bouton d'appel à l'action
+redirige vers le test d'orientation. La figure~\ref{fig:fiche_desc} montre la présentation détaillée du programme et des débouchés de la filière GTR, et la figure~\ref{fig:fiche_comp} affiche les compétences et technologies associées.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{images/Image3.png}
+\caption{Fiche filière — description, programme par semestre et débouchés professionnels du filière GTR}
+\label{fig:fiche_desc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{images/Image4.png}
+\caption{Fiche filière — Compétences et technologies du filière GTR}
+\label{fig:fiche_comp}
+\end{figure}
+% ----------------------------------------------------------
+\subsection{Connexion}
+% ----------------------------------------------------------
+
+\textbf{Route :} \texttt{/login}
+
+\textbf{Overview :}
+Page d'authentification réservée aux utilisateurs disposant d'une adresse académique valide,
+permettant l'accès sécurisé à l'espace personnel ou au panel d'administration.
+
+\textbf{Key Elements :}
+\begin{itemize}
+    \item Champ de saisie de l'adresse e-mail académique (\texttt{@uca.ac.ma} ou \texttt{@ensas.uca.ma}).
+    \item Champ de saisie du code d'accès (haché via \textit{scrypt} côté serveur).
+    \item Message d'erreur contextuel en cas d'identifiants invalides ou de compte désactivé.
+    \item Redirection automatique vers \texttt{/dashboard} (étudiant) ou \texttt{/admin/analytics} (admin).
+\end{itemize}
+
+\textbf{Interface Description :}
+La page présente un formulaire centré avec deux champs de saisie et un bouton de soumission.
+La validation du domaine e-mail est effectuée côté serveur avant toute interrogation de la base.
+Les erreurs sont affichées inline sous le formulaire via le mécanisme \texttt{flash} de Flask.
+Le design est épuré, avec un fond neutre et un logo de l'établissement en en-tête. La figure~\ref{fig:login} illustre la page de connexion.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/Image5.png}
+\caption{Page de connexion — formulaire d'authentification académique}
+\label{fig:login}
+\end{figure}
+
+% ----------------------------------------------------------
+\subsection{Test d'orientation}
+% ----------------------------------------------------------
+\subsubsection{Test d'orientation — Introduction}
+\textbf{Route :} \texttt{/test-orientation}
+
+\textbf{Overview :}
+Page statique affichée avant le démarrage du test, fournissant à l'étudiant les informations
+nécessaires sur le déroulement du questionnaire et l'invitant à commencer via un appel à l'action.
+
+\textbf{Key Elements :}
+\begin{itemize}
+    \item Présentation du test et de son objectif (évaluation de la compatibilité filière).
+    \item Instructions générales sur le format des réponses (échelle de Likert 1 à 5).
+    \item Informations sur le déroulement : nombre de questions, durée estimée, confidentialité.
+    \item Bouton de démarrage déclenchant le chargement du questionnaire interactif.
+\end{itemize}
+
+\textbf{Interface Description :}
+La page adopte une mise en page centrée et épurée, sans aucun élément de questionnaire affiché.
+Elle se compose d'un bloc d'information structuré (titre, description, liste des consignes) et
+d'un bouton de démarrage bien visible, positionné en bas de page. L'objectif de cette interface
+est de préparer l'étudiant à la passation, en assurant clarté, lisibilité et réduction de l'anxiété
+cognitive avant d'entrer dans le questionnaire. La figure~\ref{fig:test_intro} montre la page d'introduction avec les consignes détaillées.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/Image6.png}
+
+\vspace{0.5cm}
+
+\includegraphics[width=\textwidth]{images/Image7.png}
+\caption{Page d'introduction au test d'orientation — consignes et lancement du questionnaire}
+\label{fig:test_intro}
+\end{figure}
+
+% ----------------------------------------------------------
+\subsubsection{Test d'orientation — Questionnaire}
+% ----------------------------------------------------------
+
+\textbf{Route :} \texttt{/test-orientation}
+
+\textbf{Overview :}
+Interface interactive de passation du questionnaire psychométrique, permettant à l'étudiant
+de répondre à chaque question et d'obtenir ses résultats de compatibilité par filière à l'issue du test.
+
+\textbf{Key Elements :}
+\begin{itemize}
+    \item Questionnaire paginé : une question affichée par vue, avec navigation séquentielle.
+    \item Mélange aléatoire reproductible des questions (seed fixe par session).
+    \item Échelle de réponse de type Likert (1 à 5) sous forme de boutons sélectionnables.
+    \item Barre de progression dynamique indiquant l'avancement dans le questionnaire.
+    \item Affichage des résultats : classement des six filières par score de compatibilité (\%) et profil calculé.
+\end{itemize}
+
+\textbf{Interface Description :}
+Pendant la passation, chaque question est rendue individuellement avec ses cinq boutons de réponse.
+La barre de progression est mise à jour dynamiquement via JavaScript à chaque question validée.
+À la soumission finale, les réponses sont transmises en JSON à la route \texttt{/api/submit-test} ;
+les résultats sont restitués sur la même page sous forme d'un classement ordonné des six filières
+avec leur pourcentage de compatibilité et le type de profil déterminé (\textit{Spécialiste},
+\textit{Hybride} ou \textit{Équilibré}). La figure~\ref{fig:test_quest1} et la figure~\ref{fig:test_quest2} présentent l'interface du questionnaire et la barre de progression.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/Image8.png}
+\caption{Interface du questionnaire du test d'orientation — navigation par question et barre de progression}
+\label{fig:test_quest1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/Image9.png}
+\caption{Interface du questionnaire du test d'orientation — navigation par question et barre de progression}
+\label{fig:test_quest2}
+\end{figure}
+
+% ----------------------------------------------------------
+\subsection{Tableau de bord}
+% ----------------------------------------------------------
+
+\textbf{Route :} \texttt{/dashboard}
+
+\textbf{Overview :}
+Espace personnel de l'étudiant authentifié, centralisant l'historique de ses tests et
+présentant un profil global consolidé calculé sur l'ensemble de ses résultats.
+
+\textbf{Key Elements :}
+\begin{itemize}
+    \item Liste chronologique des tests passés avec date, durée et résultats associés.
+    \item Profil global agrégé (moyenne filière par filière sur tous les tests).
+    \item Type de profil consolidé : \textit{Spécialiste}, \textit{Hybride} ou \textit{Équilibré}.
+    \item Bouton d'accès rapide pour repasser le test d'orientation.
+\end{itemize}
+
+\textbf{Interface Description :}
+Page sécurisée côté serveur, organisée en deux zones : un panneau supérieur affichant le profil global avec les scores moyens par filière, et un panneau inférieur présentant l’historique des tests avec la date, la durée, le profil obtenu et des détails extensibles. Le profil global est recalculé dynamiquement à chaque chargement. La figure~\ref{fig:dashboard_ui} illustre le tableau de bord avec l'historique et le profil global consolidé.
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{images/Image10.png}
+\caption{Tableau de bord étudiant — historique des tests et profil global consolidé}
+\label{fig:dashboard_ui}
+\end{figure}
+
+% ----------------------------------------------------------
+\subsection{Administration — Analytiques}
+% ----------------------------------------------------------
+
+\textbf{Route :} \texttt{/admin/analytics}
+
+\textbf{Overview :}
+Interface de supervision statistique réservée à l'administrateur, offrant une vue globale
+sur les orientations produites par la plateforme et la distribution des profils étudiants.
+
+\textbf{Key Elements :}
+\begin{itemize}
+    \item Histogramme de répartition des recommandations par filière.
+    \item Diagramme en anneau illustrant la distribution des profils (Spécialiste, Hybride, Équilibré).
+    \item Courbe de tendance mensuelle du volume de tests réalisés.
+    \item Filtre temporel dynamique via paramètre \texttt{?days=N}.
+    \item Export CSV des données brutes via \texttt{/admin/export\_analytics\_csv}.
+\end{itemize}
+
+\textbf{Interface Description :}
+La page est structurée en un tableau de bord à plusieurs panneaux graphiques rendus via
+des bibliothèques JavaScript de visualisation. Un sélecteur de période permet de restreindre
+l'analyse à une fenêtre glissante. Les trois graphiques sont disposés en grille et mis à jour
+dynamiquement selon le filtre sélectionné. L'accès à cette page est conditionné par le
+décorateur \texttt{@admin\_required}, qui redirige tout utilisateur non habilité. La figure~\ref{fig:admin_analytics} affiche le tableau de bord analytique de l'administration.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/Image11.png}
+\caption{Administration — tableau de bord analytique avec indicateurs statistiques globaux}
+\label{fig:admin_analytics}
+\end{figure}
+
+% ----------------------------------------------------------
+\subsection{Administration — Étudiants}
+% ----------------------------------------------------------
+
+\textbf{Route :} \texttt{/admin/users}
+
+\textbf{Overview :}
+Interface de gestion des comptes étudiants, permettant à l'administrateur d'effectuer
+l'ensemble des opérations CRUD sur les utilisateurs de la plateforme.
+
+\textbf{Key Elements :}
+\begin{itemize}
+    \item Liste paginée des comptes étudiants avec initiales, filière conseillée et nombre de tests.
+    \item Formulaire d'ajout de compte (nom complet, e-mail, code d'accès initial).
+    \item Actions par compte : activation/désactivation, réinitialisation du code, suppression.
+    \item Indicateur visuel du statut du compte (actif / désactivé) et de la filière recommandée.
+\end{itemize}
+
+\textbf{Interface Description :}
+La page présente un tableau récapitulatif des comptes enregistrés, chaque ligne exposant les
+informations essentielles de l'étudiant et un groupe d'actions rapides. Les opérations de gestion
+sont réalisées de manière asynchrone via l'API REST dédiée (\texttt{POST}, \texttt{DELETE}).
+Une garde logicielle bloque toute tentative de suppression d'un compte administrateur.
+Le formulaire d'ajout est accessible via un panneau latéral ou une modale, sans rechargement
+de page. La figure~\ref{fig:admin_users} présente la gestion des comptes étudiants, tandis que la figure~\ref{fig:admin_add} montre le formulaire d'ajout d'un compte.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/Image12.png}
+\caption{Administration — gestion des comptes étudiants (ajout, activation, suppression)}
+\label{fig:admin_users}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/Image13.png}
+\caption{Administration — Ajout d'un compte étudiant}
+\label{fig:admin_add}
+\end{figure}
+% ----------------------------------------------------------
+\subsection{Chatbot (composant global)}
+% ----------------------------------------------------------
+
+\textbf{Route :} Composant flottant — visible sur toutes les pages.
+
+\textbf{Overview :}
+Widget conversationnel intégré à l'ensemble de l'interface, permettant à l'utilisateur d'obtenir
+des réponses contextuelles d'orientation sans quitter la page en cours.
+
+\textbf{Key Elements :}
+\begin{itemize}
+    \item Bouton flottant (icône de bulle de dialogue) ancré en bas à droite de chaque page.
+    \item Fenêtre de chat expansible avec historique de la conversation en cours.
+    \item Champ de saisie de message et bouton d'envoi.
+    \item Réponses générées par le modèle \texttt{mistral-tiny} via l'API Mistral AI.
+\end{itemize}
+
+\textbf{Interface Description :}
+Le widget est implémenté comme un composant HTML/CSS/JavaScript indépendant, inclus dans le
+template de base \texttt{base.html} et donc hérité par toutes les pages. Il s'affiche en
+superposition (\texttt{position: fixed}) sans perturber la mise en page sous-jacente. La
+communication avec le serveur s'effectue de manière asynchrone via \texttt{fetch} vers la route
+\texttt{/api/chat}. Les messages sont affichés dans une fenêtre scrollable alternant bulles
+utilisateur et bulles assistant. En cas d'erreur API (timeout, HTTP), un message de repli
+explicite est affiché sans interrompre l'expérience. La figure~\ref{fig:chatbot} expose le widget de chat accessible sur toutes les pages de l'application.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/Image14.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/Image15.png}
+\end{minipage}
+\caption{Chatbot — widget flottant d’assistance à l’orientation, accessible sur toutes les pages}
+\label{fig:chatbot}
+\end{figure}
+\newpage
 % ============================================================
-\section{Conclusion}
+\clearpage
+\addcontentsline{toc}{section}{Conclusion générale et perspectives}
+\section*{Conclusion générale et perspectives}
 % ============================================================
 
-Le projet \textbf{ENSA Guide} constitue une réponse fonctionnelle et technique au problème
-d'orientation des étudiants en fin de cycle préparatoire à l'ENSA Safi. L'application
-couvre l'ensemble du besoin initial : consultation des filières, test d'orientation personnalisé,
-chatbot conversationnel et gestion des comptes.
+\textbf{1. Objectifs du projet} \\
+Le projet \textbf{ENSA Guide} a été conçu avec pour objectif principal d'accompagner les étudiants du cycle préparatoire de l'ENSA Safi dans le choix de leur filière d'ingénierie. Face à l'absence d'un outil centralisé, l'application propose une évaluation objective des profils étudiants via un questionnaire psychométrique basé sur les aptitudes comportementales, afin de réduire l'incertitude liée à ce choix crucial.
 
-Le choix de la pile technologique (Python/Flask, SQLite, HTML/CSS vanilla) s'est révélé adapté
-à un projet de cette envergure~: légèreté du déploiement, absence de dépendances lourdes, et
-structure modulaire facilitant la maintenance.
+\vspace{0.5cm}
+\textbf{2. Contexte et outils utilisés} \\
+Réalisé dans le cadre de notre formation, ce projet a mobilisé une architecture MVC robuste. Le développement s'est appuyé sur Python et le framework Flask pour la logique métier, couplé à SQLite pour la gestion de la base de données. L'interface utilisateur, développée en HTML, CSS et JavaScript vanilla, garantit une navigation intuitive. De plus, l'intégration de l'API Mistral AI a permis de doter la plateforme d'un assistant virtuel intelligent, offrant un accompagnement personnalisé en langage naturel.
 
-Les principales faiblesses identifiées --- synchronisation SQL, chargement CSS conditionnel,
-et responsivité partielle --- relèvent de problèmes d'intégration et de configuration, et non
-d'une déficience architecturale. Elles sont donc corrigeables sans refonte majeure du projet.
+\vspace{0.5cm}
+\textbf{3. Limites du travail} \\
+Bien que fonctionnelle, la plateforme présente certaines limites techniques et ergonomiques. Le chargement des feuilles de style (CSS) dépend parfois de chemins relatifs, ce qui peut causer des problèmes d'affichage sur certaines routes. De plus, la synchronisation de la base de données nécessite actuellement une réinitialisation manuelle lors de modifications des données initiales. Enfin, l'interface n'est pas encore totalement adaptative (responsive) sur l'ensemble des résolutions mobiles.
+
+\vspace{0.5cm}
+\textbf{4. Améliorations possibles (Perspectives)} \\
+Plusieurs perspectives d'évolution sont envisageables pour pallier ces faiblesses et enrichir l'application. Techniquement, l'implémentation de Flask-Migrate permettrait une gestion fluide des versions de la base de données. Sur le plan ergonomique, une refonte \textit{mobile-first} des interfaces garantirait une accessibilité universelle. Fonctionnellement, il serait pertinent d'enrichir le contexte de l'intelligence artificielle avec des données plus exhaustives sur les filières, et d'ajouter un module d'exportation PDF pour les bilans d'orientation individuels.
+
+\vspace{0.5cm}
+\textbf{5. Bilan personnel} \\
+Sur le plan personnel, ce projet s'est avéré extrêmement formateur. Il nous a permis de consolider nos compétences en développement web \textit{full-stack}, de l'architecture logicielle jusqu'à l'intégration d'intelligences artificielles génératives. Au-delà de l'aspect technique, le travail en équipe et la gestion rigoureuse d'un planning sous forme de diagramme de Gantt ont renforcé notre capacité à mener un projet d'ingénierie de bout en bout, tout en répondant à un besoin réel de notre environnement académique.
 
 % ============================================================
-\section{Perspectives et améliorations}
+\clearpage
+\addcontentsline{toc}{section}{Bibliographie et Nétographie}
+\section*{Bibliographie et Nétographie}
 % ============================================================
 
-\subsection{Corrections techniques prioritaires}
-
-\begin{enumerate}
-    \item \textbf{Chargement CSS robuste} : Remplacer tous les chemins relatifs
-          des feuilles de style par des appels à \texttt{url\_for('static', filename=...)},
-          garantissant une URL absolue indépendante de la route active.
-
-    \item \textbf{Synchronisation de la base de données} : Implémenter un script de
-          migration (\texttt{migrate.py}) exécuté séparément, permettant d'appliquer
-          des modifications SQL sans supprimer la base existante. Alternativement,
-          utiliser Flask-Migrate ou un système de versionnement des schémas.
-
-    \item \textbf{Responsivité complète} : Refactoriser les feuilles de style en
-          adoptant une approche \textit{mobile-first}, avec des règles \texttt{@media}
-          systématiques pour les grilles et les sections de contenu des fiches de filière.
-\end{enumerate}
-
-\subsection{Évolutions fonctionnelles}
-
-\begin{enumerate}
-    \item \textbf{Personnalisation du chatbot} : Enrichir le contexte transmis à
-          Mistral AI avec les données de la base (descriptions des filières, questions
-          fréquentes), afin d'obtenir des réponses plus précises et contextualisées.
-
-    \item \textbf{Tableau de bord administratif enrichi} : Ajouter des graphiques
-          de répartition des profils d'orientation pour aider l'administration à
-          anticiper les flux vers chaque département.
-
-    \item \textbf{Support multilingue} : Le système de questions dispose déjà de
-          champs \texttt{texte\_en} (anglais) et \texttt{texte\_ar} (arabe).
-          L'intégration d'un sélecteur de langue dans l'interface permettrait
-          d'étendre l'accessibilité de la plateforme.
-
-    \item \textbf{Déploiement en production} : Migrer de SQLite vers PostgreSQL
-          pour un déploiement multi-utilisateurs, et conteneuriser l'application
-          avec Docker pour simplifier les mises à jour.
-\end{enumerate}
+\begin{thebibliography}{99}
+    \bibitem{flask} \textbf{Documentation Flask} : \textit{Flask (A Python Microframework)}, Pallets Projects. Disponible sur : \url{https://flask.palletsprojects.com/} — Consulté le : 15 Mai 2026.
+    \bibitem{sqlite} \textbf{Documentation SQLite} : \textit{SQLite Documentation}. Disponible sur : \url{https://www.sqlite.org/docs.html} — Consulté le : 15 Mai 2026.
+    \bibitem{python} \textbf{Python Official Documentation} : \textit{Python 3 Documentation}. Disponible sur : \url{https://docs.python.org/3/} — Consulté le : 15 Mai 2026.
+    \bibitem{mistral} \textbf{Mistral AI} : \textit{Documentation officielle de l'API Mistral AI}. Disponible sur : \url{https://docs.mistral.ai/} — Consulté le : 15 Mai 2026.
+    \bibitem{jinja} \textbf{Jinja2} : \textit{Jinja2 Templating Documentation}. Disponible sur : \url{https://jinja.palletsprojects.com/} — Consulté le : 15 Mai 2026.
+    \bibitem{numpy} \textbf{NumPy} : \textit{NumPy Documentation}. Disponible sur : \url{https://numpy.org/doc/} — Consulté le : 15 Mai 2026.
+    \bibitem{werkzeug} \textbf{Werkzeug} : \textit{Werkzeug Documentation}. Disponible sur : \url{https://werkzeug.palletsprojects.com/} — Consulté le : 15 Mai 2026.
+    \bibitem{mdn} \textbf{MDN Web Docs} : \textit{HTML, CSS, JavaScript}, Mozilla. Disponible sur : \url{https://developer.mozilla.org/} — Consulté le : 15 Mai 2026.
+    \bibitem{mvc} \textbf{Architecture MVC} : \textit{Modèle-vue-contrôleur}, notions et principes de conception logicielle.
+    \bibitem{ensa} \textbf{ENSA Safi} : Livret de l'étudiant et ressources internes de l'École Nationale des Sciences Appliquées de Safi (descriptions des filières et programmes).
+\end{thebibliography}
 
 \end{document}

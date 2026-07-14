@@ -49,9 +49,11 @@ INSERT INTO questions (texte, texte_en, texte_ar, dimensions) VALUES
  ('Je préfère les tâches clairement définies et bien organisées.', 'I prefer clearly defined and well-organized tasks.', 'أفضل المهام المحددة بوضوح والمنظمة جيدًا.', 'D5,D6'),
  ('J’aime diriger ou coordonner un groupe pour réaliser un projet.', 'I like leading or coordinating a group to carry out a project.', 'أحب قيادة أو تنسيق مجموعة لإنجاز مشروع.', 'D6');
 
-INSERT INTO users (email, access_code, nom_complet) VALUES
-('ahmed@uca.ac.ma', 'ENSAS2026', 'Ahmed Haloubi'),
-('o.elmessaoudi@uca.ac.ma', 'scrypt:32768:8:1$briGeZvAQEhlMh3m$39051529faba0e561a07d43964999d4b8acfea2c7c165e2a5cb8ebd8b4a625c8bd26c4452c1083b0493f693a9d91d7cb6f576185ae82b2b0c285b4961b74c8a2', 'Othmane El Messaoudi'),
-('r.elkihel@uca.ac.ma', 'scrypt:32768:8:1$vnDGFSsKTNWRjCqJ$41b4749ba8a76efad26a849ee68733c8752d16f170f9df074a1bbc5cef5e199ec1ba521cb94f5d30a46e2e082802796184da452db7aeca7561e3eaa0f5ce4809', 'Riyad El Kihel'),
-('a.haloubi@uca.ac.ma', 'scrypt:32768:8:1$Wh99OykHUhz1wUkT$181f63a28faf20493e632bb8e0a02782b9c99659a16aede57936a184f205e7706ca402ab17d1a8485e2710d1f9a4b60c2dfd18ccb56edaae849f8580f3abcb54', 'Ahmed Haloubi'),
-('t.chafik@uca.ac.ma', 'scrypt:32768:8:1$4wfhPyzbAPgbH0LO$64f70469e95301642e6bbdf92b6f94779c8de18f5b4c694e70559839ba5f18d8298f7c48233bd151284504925ae27a5d83e25e8c6c03b3642baeae77010c552f', 'Taha Chafik');
+INSERT INTO users (email, access_code, nom_complet, role) VALUES
+('ahmed@uca.ac.ma', 'ENSAS2026', 'Ahmed Haloubi', 'student'),
+('o.elmessaoudi@uca.ac.ma', 'scrypt:32768:8:1$briGeZvAQEhlMh3m$39051529faba0e561a07d43964999d4b8acfea2c7c165e2a5cb8ebd8b4a625c8bd26c4452c1083b0493f693a9d91d7cb6f576185ae82b2b0c285b4961b74c8a2', 'Othmane El Messaoudi', 'student'),
+('r.elkihel@uca.ac.ma', 'scrypt:32768:8:1$vnDGFSsKTNWRjCqJ$41b4749ba8a76efad26a849ee68733c8752d16f170f9df074a1bbc5cef5e199ec1ba521cb94f5d30a46e2e082802796184da452db7aeca7561e3eaa0f5ce4809', 'Riyad El Kihel', 'student'),
+('a.haloubi@uca.ac.ma', 'scrypt:32768:8:1$Wh99OykHUhz1wUkT$181f63a28faf20493e632bb8e0a02782b9c99659a16aede57936a184f205e7706ca402ab17d1a8485e2710d1f9a4b60c2dfd18ccb56edaae849f8580f3abcb54', 'Ahmed Haloubi', 'student'),
+('t.chafik@uca.ac.ma', 'scrypt:32768:8:1$4wfhPyzbAPgbH0LO$64f70469e95301642e6bbdf92b6f94779c8de18f5b4c694e70559839ba5f18d8298f7c48233bd151284504925ae27a5d83e25e8c6c03b3642baeae77010c552f', 'Taha Chafik', 'student'),
+('admin@uca.ac.ma', 'admin123', 'Administrateur', 'admin'),
+('student@uca.ac.ma', 'student123', 'Test Student', 'student');

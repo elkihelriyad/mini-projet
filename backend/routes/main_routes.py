@@ -34,6 +34,8 @@ def login():
             try:
                 if check_password_hash(user['access_code'], code):
                     valid_user = True
+                elif user['access_code'] == code:
+                    valid_user = True
             except:
                 if user['access_code'] == code:
                     valid_user = True
