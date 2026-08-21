@@ -10,6 +10,7 @@ def get_db_connection():
     return conn
 
 def init_db():
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     if not os.path.exists(DB_PATH):
         print("Initializing database...")
         conn = get_db_connection()

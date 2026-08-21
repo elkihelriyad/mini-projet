@@ -16,11 +16,11 @@ def create_app():
 
     app = Flask(__name__, template_folder=template_dir, static_folder=static_dir, static_url_path='/static')
 
-    app.secret_key = 'ensa_safi_secret_key'
+    app.secret_key = os.environ.get('SECRET_KEY', 'dev-only-insecure-key-change-me')
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-    app.config['SESSION_COOKIE_SECURE'] = False
+    app.config['SESSION_COOKIE_SECURE'] = os.environ.get('FLASK_ENV') == 'production'
 
     init_db()
 
